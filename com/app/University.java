@@ -57,6 +57,7 @@ public interface University
 	}
 
 	static int getkeyPress() {
+		return getIntegerFromInput();
 		while (true) {
 			try {
 				int integer = Integer.parseInt(AppKeyListener.getKeyPressed());
