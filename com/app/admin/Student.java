@@ -39,15 +39,15 @@ public class  Student extends Person
 	public String display(){return super.display()+"\n5. Roll No: "+ rollNo +"\n6. Branch : "+branch+"\n7. Semester : "+semester+"\n8. CGPA : "+cgpa;}
 
 	public void readData() {
-		System.out.print("\nEnter  Name : ");this.name  = scanner.next();
-		System.out.print("\nEnter  Roll No : ");this.rollNo = University.getIntegerFromInput();
+		System.out.print("\nEnter  Name : "); this.name  = scanner.next();
+		System.out.print("\nEnter  Roll No : "); this.rollNo = University.getIntegerFromInput();
 		System.out.print("\nEnter  Semester : "); this.semester = University.getIntegerFromInput();
 		System.out.print("\nEnter  No of Courses : "); this.no_courses = University.getIntegerFromInput();
-		System.out.print("\nEnter  DOB : ");this.setDOB(scanner.next());
-		System.out.print("\nEnter  Mobile : ");this.mobile = University.getLongFromInput();
-		System.out.print("\nEnter  Email Id : ");this.emailId= scanner.next();
-		System.out.print("\nEnter  Branch : ");this.branch = scanner.next();
-		System.out.print("\nEnter  CGPA : ");this.cgpa = University.getDoubleFromInput();
+		System.out.print("\nEnter  DOB : "); this.setDOB(scanner.next());
+		System.out.print("\nEnter  Mobile : "); this.mobile = University.getLongFromInput();
+		System.out.print("\nEnter  Email Id : "); this.emailId= scanner.next();
+		System.out.print("\nEnter  Branch : "); this.branch = scanner.next();
+		System.out.print("\nEnter  CGPA : "); this.cgpa = University.getDoubleFromInput();
 	}
 
 	@Override
