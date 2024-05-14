@@ -79,37 +79,39 @@ public class AdminApp implements University {
 		if (student == null){return;}
 		printHeader("Updating Student Details > " + student.getName());
 		System.out.println(student.display());
-		System.out.print("Choose the serial number of category to Update : ");
-		switch(University.getIntegerFromInput())
-		{
-			case 1: System.out.print("Enter the new Name :");
-			student.name = scanner.next();
-			break;
-			case 2: System.out.print("Enter the new DOB :");
-			student.setDOB(scanner.next());
-			break;
-			case 3: System.out.print("Enter the new Email ID :");
-			student.emailId = scanner.next();
-			break;
-			case 4: System.out.print("Enter the new Mobile :");
-			student.mobile = University.getLongFromInput();
-			break;
-			case 5: System.out.print("Enter the new Roll No :");
-			student.rollNo = University.getIntegerFromInput();
-			break;
-			case 6: System.out.print("Enter the new Branch :");
-			student.branch = scanner.next();
-			break;
-			case 7: System.out.print("Enter the new Semester :");
-			student.setSemester(University.getIntegerFromInput());
-			break;
-			case 8: System.out.print("Enter the new CGPA :");
-			student.cgpa = University.getIntegerFromInput();
-			break;
+		System.out.print("Choose the serial number of category to Update or zero to return: ");
+		loop : while (true) {
+			switch(University.getIntegerFromInput())
+			{
+				case 1: System.out.print("Enter the new Name :");
+				student.name = scanner.next();
+				break;
+				case 2: System.out.print("Enter the new DOB :");
+				student.setDOB(scanner.next());
+				break;
+				case 3: System.out.print("Enter the new Email ID :");
+				student.emailId = scanner.next();
+				break;
+				case 4: System.out.print("Enter the new Mobile :");
+				student.mobile = University.getLongFromInput();
+				break;
+				case 5: System.out.print("Not allowed to change Roll No.");
+				break;
+				case 6: System.out.print("Enter the new Branch :");
+				student.branch = scanner.next();
+				break;
+				case 7: System.out.print("Enter the new Semester :");
+				student.setSemester(University.getIntegerFromInput());
+				break;
+				case 8: System.out.print("Enter the new CGPA :");
+				student.cgpa = University.getIntegerFromInput();
+				break;
+				case 0: break loop;
+				}
+			System.out.println("Updated Data :");
+			System.out.println(student.display());
+			UniversityApp.holdNextSlide();
 		}
-		System.out.println("Updated Data :");
-		System.out.println(student.display());
-		UniversityApp.holdNextSlide();
 	}
 
 	void updateFaculty()   {
@@ -118,36 +120,46 @@ public class AdminApp implements University {
 		if (faculty == null){return;}
 		printHeader("Updating Faculty Details > " + faculty.getName());
 		System.out.println(faculty.display());
-		System.out.print("Choose the serial number of category to Update:");
-		switch(University.getIntegerFromInput())
-		{
-			case 1: System.out.print("Enter the new Name: ");
-			faculty.name = scanner.next();
-			break;
-			case 2: System.out.print("Enter the new DOB: ");
-			faculty.setDOB(scanner.next());
-			break;
-			case 3: System.out.print("Enter the new Email ID: ");
-			faculty.emailId = scanner.next();
-			break;
-			case 4: System.out.print("Enter the new Mobile: ");
-			faculty.mobile = University.getLongFromInput();
-			break;
-			case 5: System.out.print("Enter the new Employee code: ");
-			faculty.setEmpCode(University.getIntegerFromInput());
-			break;
-			case 6: System.out.print("Enter the new Department: ");
-			faculty.setDepartment(scanner.next());
-			break;
-			case 7: System.out.print("Enter the new Experience: ");
-			faculty.setExperience(University.getIntegerFromInput());
-			break;
-			case 8: System.out.print("Enter the new Salary: ");
-			faculty.setSalary(University.getIntegerFromInput());
-			break;
-			case 9: System.out.print("Enter new Number of Teaching Courses: ");
-			faculty.setNoCourses(University.getIntegerFromInput());
-			break;
+		System.out.print("Choose the serial number of category to Update or zero to return:");
+		loop: while (true) {
+			switch (University.getIntegerFromInput()) {
+				case 1:
+					System.out.print("Enter the new Name: ");
+					faculty.name = scanner.next();
+					break;
+				case 2:
+					System.out.print("Enter the new DOB: ");
+					faculty.setDOB(scanner.next());
+					break;
+				case 3:
+					System.out.print("Enter the new Email ID: ");
+					faculty.emailId = scanner.next();
+					break;
+				case 4:
+					System.out.print("Enter the new Mobile: ");
+					faculty.mobile = University.getLongFromInput();
+					break;
+				case 5:
+					System.out.print("Not Allowed to change Employee code: ");
+					break;
+				case 6:
+					System.out.print("Enter the new Department: ");
+					faculty.setDepartment(scanner.next());
+					break;
+				case 7:
+					System.out.print("Enter the new Experience: ");
+					faculty.setExperience(University.getIntegerFromInput());
+					break;
+				case 8:
+					System.out.print("Enter the new Salary: ");
+					faculty.setSalary(University.getIntegerFromInput());
+					break;
+				case 9:
+					System.out.print("Enter new Number of Teaching Courses: ");
+					faculty.setNoCourses(University.getIntegerFromInput());
+					break;
+				case 0: break loop;
+			}
 		}
 		System.out.println("Updated Data :");
 		System.out.println(faculty.display());

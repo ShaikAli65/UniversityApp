@@ -135,11 +135,11 @@ public class UniversityApp implements University
     }
 
     public static void getError(int error_code) {
-        switch(error_code)
-        {
-            case 1-> System.out.println("\n\u001B[31m#ERROR://\u001B[0mEnter An Authentic Input .. error code 001\n");
+        switch(error_code) {
+            case 1 -> System.out.println("\n\u001B[31m#ERROR://\u001B[0mEnter An Authentic Input .. error code 001\n");
 
-            case 2 -> System.out.println("\n\u001B[31m#ERROR://\u001B[0mCan't Authenticate you Sorry... error code 002\n");
+            case 2 ->
+                    System.out.println("\n\u001B[31m#ERROR://\u001B[0mCan't Authenticate you Sorry... error code 002\n");
 
             case 3 -> {
                 System.out.println("\n\u001B[31m#ERROR://\u001B[0mNo Student-Courses Found... error code 003\n");
@@ -149,7 +149,7 @@ public class UniversityApp implements University
                 System.out.println("\n\u001B[31m#ERROR://\u001B[0mNo Faculty-Courses Found... error code 004\n");
                 holdNextSlide();
             }
-            case 6-> System.out.println("\n\t\u001B[31mERROR://\u001B[0m INVALID CHOICE error code 006\t\n");
+            case 6 -> System.out.println("\n\t\u001B[31mERROR://\u001B[0m INVALID CHOICE error code 006\t\n");
 
             case 7 -> {
                 System.out.println("\u001B[31mERROR://\u001B[0mLooks like data does not contain any student with that index error code 007");
@@ -176,18 +176,16 @@ public class UniversityApp implements University
                 holdNextSlide();
             }
 
-            case 13-> System.out.println("\u001B[31mERROR://\u001B[0mIncorrect Password");
+            case 13 -> System.out.println("\u001B[31mERROR://\u001B[0mIncorrect Password");
 
             case 15 -> {
                 System.out.println("\u001B[31mERROR://Authentication Failed\u001B[0m");
                 holdNextSlide();
             }
 
-            case 16-> System.out.println("\u001B[31mERROR://\u001B[0mNot a Valid date.. error code 016\n");
+            case 16 -> System.out.println("\u001B[31mERROR://\u001B[0mNot a Valid date.. error code 016\n");
 
-            case 17 -> {
-                System.out.println("\u001B[31mERROR://\u001B[0mNo exams are scheduled.. error code 017\n");
-            }
+            case 17 -> System.out.println("\u001B[31mERROR://\u001B[0mNo exams are scheduled.. error code 017\n");
             case 18 -> {
                 System.out.println("\u001B[31mERROR://\u001B[0mNo matched courses were found error code 018\n");
                 holdNextSlide();
@@ -196,7 +194,7 @@ public class UniversityApp implements University
                 System.out.println("\u001B[31mERROR://\u001B[0mNo sessions were found error code 019\n");
                 holdNextSlide();
             }
-            default-> System.out.println("\u001B[31m//UNDEFINED ERROR//\u001B[0m");
+            default -> System.out.println("\u001B[31m//UNDEFINED ERROR//\u001B[0m");
         }
     }
 

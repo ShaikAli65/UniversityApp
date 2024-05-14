@@ -36,7 +36,9 @@ public class  Student extends Person
 
 	// Utility Methods
 
-	public String display(){return super.display()+"\n5. Roll No: "+ rollNo +"\n6. Branch : "+branch+"\n7. Semester : "+semester+"\n8. CGPA : "+cgpa;}
+	public String display() {
+		return super.display() + "\n5. Roll No: " + rollNo + "\n6. Branch : " + branch + "\n7. Semester : " + semester + "\n8. CGPA : " + cgpa;
+	}
 
 	public void readData() {
 		System.out.print("\nEnter  Name : "); this.name  = scanner.next();
@@ -47,7 +49,6 @@ public class  Student extends Person
 		System.out.print("\nEnter  Mobile : "); this.mobile = University.getLongFromInput();
 		System.out.print("\nEnter  Email Id : "); this.emailId= scanner.next();
 		System.out.print("\nEnter  Branch : "); this.branch = scanner.next();
-		System.out.print("\nEnter  CGPA : "); this.cgpa = University.getDoubleFromInput();
 	}
 
 	@Override
