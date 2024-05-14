@@ -65,7 +65,7 @@ public class StudentCourse
 		if(noCourses == 0) {
 			System.out.println("Choose number of subjects to register in this semester\n");
 		}
-		if( count < noCourses)
+		if( count <= noCourses)
 		{
 			if (courses.containsKey(c)) {
 				System.out.println("Course already registered\n");
@@ -83,6 +83,7 @@ public class StudentCourse
 				return;
 			}
 			courses.remove(c);
+			count--;
 		}
 	}
 

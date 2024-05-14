@@ -25,7 +25,7 @@ public class FacultyCourse
 		if(no_courses == 0) {
 			System.out.println("Choose number of subjects to register in this semester\n");
 		}
-		if( count < no_courses)
+		if( count <= no_courses)
 		{
 			if (course.contains(c)) {
 				System.out.println("Course already registered\n");
@@ -43,6 +43,7 @@ public class FacultyCourse
 				return;
 		}
 			course.remove(c);
+			count--;
 		}
 	}
 
@@ -55,7 +56,7 @@ public class FacultyCourse
 	public Course getCourseChoice() {
 		System.out.println("Courses taught by You : \n");
 		int i = 1;
-		for(Course c: course){
+		for(Course c: course) {
 			System.out.println(i + ". " + c.toString());
 			i++;
 		}
