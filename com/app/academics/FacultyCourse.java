@@ -1,22 +1,29 @@
 package app.academics;
+
 import app.University;
 import app.UniversityApp;
-import app.admin.*;
+import app.admin.Faculty;
 
-import java.util.ArrayList;
+import java.io.Serializable;
+import java.util.HashSet;
 
-public class FacultyCourse
+public class FacultyCourse implements Serializable
 {
 	// Structure to store
-	final ArrayList<Course> course;
+	final HashSet<Course> courses;
 
 	private int count;
 	private final int no_courses;
 
-	FacultyCourse(Faculty f) {
+	public FacultyCourse(Faculty f) {
 		no_courses = f.getNoCourses();
-		course = new ArrayList<>(no_courses);
+		courses = new HashSet<>(no_courses);
 		count = 0;
+	}
+	public FacultyCourse(Faculty f, HashSet<Course> c) {
+		no_courses = f.getNoCourses();
+		courses = c;
+		count = c.size();
 	}
 
 	// Utility Functions
@@ -27,28 +34,28 @@ public class FacultyCourse
 		}
 		if( count <= no_courses)
 		{
-			if (course.contains(c)) {
+			if (courses.contains(c)) {
 				System.out.println("Course already registered\n");
 				return;
 			}
-			course.add(c);
+			courses.add(c);
 			count++;
 		}
 	}
 
 	public void remove(Course c) {
 		if (count > 0) {
-			if (!course.contains(c)) {
+			if (!courses.contains(c)) {
 				System.out.println("Course not registered\n");
 				return;
 		}
-			course.remove(c);
+			courses.remove(c);
 			count--;
 		}
 	}
 
 	public boolean contains(Course c) {
-		return course.contains(c);
+		return courses.contains(c);
 	}
 
 	// Getters
@@ -56,26 +63,29 @@ public class FacultyCourse
 	public Course getCourseChoice() {
 		System.out.println("Courses taught by You : \n");
 		int i = 1;
-		for(Course c: course) {
+		for(Course c: courses) {
 			System.out.println(i + ". " + c.toString());
 			i++;
 		}
 		System.out.print("\nEnter the course index to select : ");
 		int ch = University.getIntegerFromInput();
-		if(ch > course.size() || ch < 1)
+		if(ch > courses.size() || ch < 1)
 		{
 			UniversityApp.getError(6);
 			return null;
 		}
-		return course.get(ch-1);
+		return (Course) courses.toArray()[ch-1];
 	}
 
+	public boolean hasCourse(Course course) {
+		return courses.contains(course);
+	}
 	// Display Functions
 	@Override
 	public String toString() {
 		StringBuilder ret= new StringBuilder("\nTeaching Courses : \n\n");
 		int i = 1;
-        for (Course value : course) {
+        for (Course value : courses) {
             ret.append(i).append(". ").append(value.toString()).append("\n");
 			i++;
         }

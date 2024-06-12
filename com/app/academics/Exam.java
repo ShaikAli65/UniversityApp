@@ -1,17 +1,18 @@
-package app.faculty;
+package app.academics;
 
 import app.Date;
 import app.University;
 import app.UniversityApp;
-import app.academics.AcademicsApp;
 import app.admin.*;
+import db.CourseDB;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class Exam {
+public class Exam implements Serializable {
     final private Date date;
     final private Course course;
     final private Map<Student, Integer> marksStudents;
@@ -30,7 +31,7 @@ public class Exam {
 
     public void getMarksEntriesFromInput() {
         System.out.println("Enter Marks of respective students\n");
-        Stream<Student> students = AcademicsApp.getStudentsWithCourse(course);
+        Stream<Student> students = CourseDB.getStudentsWithCourse(course);
         students.forEach(student -> {
             System.out.print("ROLL NO : " + student.getRollNo() + "\tMarks : ");
             var marks = University.getIntegerFromInput();
@@ -71,11 +72,13 @@ public class Exam {
         var rollNo = University.getIntegerFromInput();
         marksStudents.keySet().stream().filter(student -> student.getRollNo() == rollNo)
                 .findFirst()
-                .ifPresentOrElse(student -> {
-                System.out.print("Enter new marks : ");
-                var marks = University.getIntegerFromInput();
-                marksStudents.put(student, marks);
-                }, () -> UniversityApp.getError(6));
+                .ifPresentOrElse(
+                        student -> {
+                                System.out.print("Enter new marks : ");
+                                var marks = University.getIntegerFromInput();
+                                marksStudents.put(student, marks);
+                        }
+                , () -> UniversityApp.getError(6));
     }
 
     @Override
@@ -91,4 +94,11 @@ public class Exam {
         return Objects.hash(date, course);
     }
 
+    public boolean withCourse(Course course) {
+        return this.course.equals(course);
+    }
+
+    public Course getCourse() {
+        return course;
+    }
 }

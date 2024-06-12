@@ -4,59 +4,23 @@ import app.University;
 import app.UniversityApp;
 import app.admin.*;
 
-import java.util.HashMap;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
-public class StudentCourse
+public class StudentCourse implements Serializable
 {
-	//Structure to store the courses registered by the student
-	final HashMap<Course, String> courses;
+	// Structure to store the courses registered by the student
+	final List<Course> courses;
 
 	private int count;
 	private final int noCourses;
 
-	StudentCourse(Student student) {
+	public StudentCourse(Student student) {
 		noCourses = student.getNoCourses();
-		courses = new HashMap<>(noCourses);
+		courses = new ArrayList<>(noCourses);
 		count = 0;
-	}
-
-	// Attendance methods
-
-	public void addAttendance(Course course, boolean attendance) {
-		if (courses.containsKey(course)) {
-			String[] presentConducted = courses.get(course).split("/");
-			courses.put(course, (Integer.parseInt(presentConducted[0]) + (attendance ? 1 : 0))
-					+ "/" + (Integer.parseInt(presentConducted[1]) + 1));
-		}
-	}
-
-	public void removeAttendance(Course course, boolean attendance) {
-		if (courses.containsKey(course)) {
-			String[] presentConducted = courses.get(course).split("/");
-			int present = Integer.parseInt(presentConducted[0]) - (attendance ? 1 : 0);
-			int conducted = Integer.parseInt(presentConducted[1]) - 1;
-
-			courses.put(course, present + "/" + conducted);
-		}
-	}
-
-	public void toggleAttendance(Course course) {
-		if (courses.containsKey(course)) {
-			String[] presentConducted = courses.get(course).split("/");
-			int present = Integer.parseInt(presentConducted[0]);
-			int conducted = Integer.parseInt(presentConducted[1]);
-			courses.put(course, (conducted - present) + "/" + conducted);
-		}
-	}
-
-	public void editAttendance(Course course, boolean attendance) {
-		if (courses.containsKey(course)) {
-			String[] presentConducted = courses.get(course).split("/");
-			int present = Integer.parseInt(presentConducted[0]);
-			int conducted = Integer.parseInt(presentConducted[1]);
-			courses.put(course, (attendance ? present + 1 : present - 1) + "/" + conducted);
-		}
 	}
 
 	// Course methods
@@ -67,18 +31,18 @@ public class StudentCourse
 		}
 		if( count <= noCourses)
 		{
-			if (courses.containsKey(c)) {
+			if (courses.contains(c)) {
 				System.out.println("Course already registered\n");
 				return;
 			}
-			courses.put(c, "0/0");
+			courses.add(c);
 			count++;
 		}
 	}
 
 	public void remove(Course c) {
 		if (count > 0) {
-			if (!courses.containsKey(c)) {
+			if (!courses.contains(c)) {
 				System.out.println("Course not registered\n");
 				return;
 			}
@@ -87,8 +51,9 @@ public class StudentCourse
 		}
 	}
 
-	public boolean contains(Course c) {
-		return courses.containsKey(c);
+	public boolean contains(Course c)
+	{
+		return courses.contains(c);
 	}
 
 	// Utility methods
@@ -100,27 +65,13 @@ public class StudentCourse
 	public String display() {
 		StringBuilder result = new StringBuilder("\nRegistered Courses :\n\n");
 		int i = 1;
-		for (Course course : courses.keySet()) {
+		for (Course course : courses) {
 			result.append(i).append(". ").append(course.toString()).append("\n");
 		}
 		return result.toString();
 	}
 
 	// getters
-
-	public Stream<Course> getCourses() {
-		return courses.keySet().stream();
-	}
-
-	public String getAttendance(Course course) {
-		if (courses.containsKey(course)) {
-			String[] presentConducted = courses.get(course).split("/");
-			int present = Integer.parseInt(presentConducted[0]);
-			int conducted = Integer.parseInt(presentConducted[1]);
-			return present + "/" + conducted + " (" + (conducted == 0 ? 0 : (present * 100) / conducted) + "%)";
-		}
-        return "0/0 (0%)";
-}
 
 	public Course getCourseChoice() {
 
@@ -132,13 +83,13 @@ public class StudentCourse
 		// Display the list of courses
 		System.out.println("Courses registered by the student\n");
 		int index = 1;
-		for (Course course : courses.keySet()) {
+		for (Course course : courses) {
 			System.out.println(index + ". " + course.toString());
 			index++;
 		}
 
 		// Get user input for course choice
-		System.out.print("\nEnter the course index: ");
+		System.out.print("\nEnter the course index or zero to return: ");
 		int choiceIndex = University.getIntegerFromInput() - 1;
 
 		// Validate user input
@@ -147,11 +98,19 @@ public class StudentCourse
 			return null;
 		}
 
-		Course[] courseArray = courses.keySet().toArray(new Course[0]);
+		Course[] courseArray = courses.toArray(new Course[0]);
 		return courseArray[choiceIndex];
-
 	}
 
+	public Stream<Course> getCourses() {
+		return courses.stream();
+	}
+	public Course getCourse(String code) {
+		return courses.stream()
+				.filter(course -> course.getCode().equals(code))
+				.findFirst()
+				.orElse(null);
+	}
 	public int getNoCourses() {
 		return noCourses;
 	}

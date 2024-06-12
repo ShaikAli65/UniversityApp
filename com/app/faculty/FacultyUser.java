@@ -1,27 +1,25 @@
 package app.faculty;
 
-import app.*;
-import app.academics.AcademicsApp;
-import app.academics.FacultyCourse;
+import app.Time;
+import app.University;
+import app.UniversityApp;
+import app.academics.Exam;
 import app.admin.Faculty;
-import app.admin.Student;
+import db.AttendanceDB;
+import db.CourseDB;
+import db.ExamDB;
+import db.SessionDB;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
 
-public class FacultyUser implements University
+public class FacultyUser implements University, Serializable
 {
-    final private ArrayList<Session> session_list;
-    final private ArrayList<Exam> exams_list;
+
     final private char[] passwordArray;
     final private Faculty faculty;
 
     public FacultyUser(Faculty faculty) {
-        session_list = new ArrayList<>(1);
-        exams_list = new ArrayList<>(1);
         passwordArray = University.getPasswordFromInput();
         this.faculty = faculty;
     }
@@ -40,28 +38,83 @@ public class FacultyUser implements University
 
     // Utility Functions
 
-    public void addSession(FacultyCourse facCourse) {
-        if (facCourse == null) return;
+    public void addSession() {
+        var courses_cache = CourseDB.getCourses(this.faculty);
         printHeader("Adding Session");
         Time time = new Time();
         time.addTime();
-        Session session = new Session(time, facCourse.getCourseChoice(), this.faculty);
+        Session session = new Session(time, courses_cache.getCourseChoice(), this.faculty);
         printHeader("Adding Session > Entering Attendance");
         session.takeAttendanceEntries();
-        session_list.add(session);
+        SessionDB.add(session);
     }
 
-    public void enterExamData(FacultyCourse facultyCourse) {
-        if (facultyCourse == null) return;
+    public void displaySessions() {
+        printHeader("Displaying Sessions");
+        var session = getSessionChoice();
+        if (session == null) {
+            return;
+        }
+        session.printSession();
+    }
+
+    void updateSession() {
+        printHeader("Updating Session");
+        var session = getSessionChoice();
+        if (session == null) {return;}
+        printHeader("Updating Session >" + session);
+        session.updateSession();
+        SessionDB.update(session);
+    }
+
+    public void deleteSession() {
+        printHeader("Deleting Session");
+        var session = getSessionChoice();
+        if (session == null) {
+            return;
+        }
+        for (var entry : session.getAttendees().entrySet()) {
+//            Student student = entry.getKey();
+//            Boolean attendance = entry.getValue();
+            AttendanceDB.delete(entry.getKey(), session.getCourse(), entry.getValue());
+        }
+        SessionDB.remove(session);
+    }
+
+    public Session getSessionChoice() {
+        var session_cache = SessionDB.getSessions(this.faculty);
+        if (session_cache.isEmpty()) {UniversityApp.getError(19);return null;}
+
+        System.out.println("These are the sessions you have: ");
+        int i = 1;
+        for (Session session : session_cache) {
+            System.out.println(i + ". " + session.getTime());
+            i++;
+        }
+
+        System.out.print("\nEnter the session number you want to select or zero to return: ");
+        int choice = University.getIntegerFromInput() - 1;
+        if(choice == -1) {return null;}
+        try {
+            return session_cache.get(choice);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public void enterExamData() {
         printHeader("Entering Exam Data");
-
-        var course = facultyCourse.getCourseChoice();
-
-        List<Exam> exams = AcademicsApp.getExams(course);
-        if (exams == null) {
+        var courses_cache = CourseDB.getCourses(this.faculty);
+        var course = courses_cache.getCourseChoice();
+        if (course == null) {
+            return;
+        }
+        var exams = ExamDB.getExams(course);
+        if (exams.isEmpty()) {
             UniversityApp.getError(17);
             return;
         }
+
         printHeader("Entering Exam Data > Entering Marks");
         System.out.println("Here are the exams for the course: " + course.getName());
         int i = 1;
@@ -70,113 +123,17 @@ public class FacultyUser implements University
             i++;
         }
 
-        System.out.print("\nEnter the exam number you want to select or zero to exit:");
+        System.out.print("\nEnter the exam number you want to select or zero to exit: ");
         int choice = University.getIntegerFromInput() - 1;
         if (choice == -1) return;
         printHeader("Entering Exam Data > Entering Marks");
-
         try {
             var exam = exams.get(choice);
             exam.getMarksEntriesFromInput();
-            exams_list.add(exam);
+            ExamDB.update(exam);
         } catch (Exception e) {
             UniversityApp.getError(17);
         }
-    }
-
-    public void deleteSession() {
-        printHeader("Deleting Session");
-        if(session_list.isEmpty()) {UniversityApp.getError(19);return;}
-        var session = getSessionChoice();
-        if (session == null) {
-            return;
-        }
-
-        for (Map.Entry<Student, Boolean> entry : session.getAttendees().entrySet()) {
-            Student student = entry.getKey();
-            Boolean attendance = entry.getValue();
-            AcademicsApp.getStudentCourse(student).removeAttendance(session.getCourse(), attendance);
-        }
-
-        session_list.remove(session);
-    }
-
-    public void deleteExam() {
-        printHeader("Deleting Exam");
-        var exam = getExamChoice();
-        if (exam == null) {
-            return;
-        }
-        exams_list.remove(exam);
-    }
-
-    void updateSession() {
-        printHeader("Updating Session");
-         if(session_list.isEmpty()) {UniversityApp.getError(19);return;}
-        var session = getSessionChoice();
-        if (session == null) {return;}
-        printHeader("Updating Session >" + session);
-        session.updateSession();
-    }
-
-    void updateExam() {
-        printHeader("Updating Exam");
-        var exam = getExamChoice();
-        if (exam == null) {return;}
-        printHeader("Updating Exam >" + exam);
-        exam.updateExam();
-    }
-
-    // Getters
-
-    public Exam getExamChoice() {
-        if (exams_list.isEmpty()) {
-            UniversityApp.getError(17);
-            return null;
-        }
-        System.out.println("These are the exams conducted:");
-        printExams();
-        System.out.println("Enter the exam number you want to select:");
-        int choice = University.getIntegerFromInput() - 1;
-        try {
-            return exams_list.get(choice);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public Session getSessionChoice() {
-        if (session_list.isEmpty()) {UniversityApp.getError(19);return null;}
-
-        System.out.println("These are the sessions you have: ");
-        printSessions();
-
-        System.out.print("\nEnter the session number you want to select or zero to return: ");
-        int choice = University.getIntegerFromInput() - 1;
-        if(choice == -1) {return null;}
-        try {
-            return session_list.get(choice);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public Stream<Session> getSessionStream() {
-        return this.session_list.stream();
-    }
-
-    // Print Functions
-
-    public void displaySessions() {
-        printHeader("Displaying Sessions");
-
-        if(session_list.isEmpty()) {UniversityApp.getError(19);return;}
-        var session = getSessionChoice();
-
-        if (session == null) {
-            return;
-        }
-        session.printSession();
     }
 
     public void displayExams() {
@@ -188,19 +145,42 @@ public class FacultyUser implements University
         exam.printExam();
     }
 
-    public void printExams() {
+    void updateExam() {
+        printHeader("Updating Exam");
+        var exam = getExamChoice();
+        if (exam == null) {return;}
+        printHeader("Updating Exam >" + exam);
+        exam.updateExam();
+        ExamDB.update(exam);
+    }
+
+    public void deleteExam() {
+        printHeader("Deleting Exam");
+        var exam = getExamChoice();
+        if (exam == null) {
+            return;
+        }
+        ExamDB.remove(exam);
+    }
+
+    public Exam getExamChoice() {
+        var exams_cache = ExamDB.getExams(this.faculty);
+        if (exams_cache.isEmpty()) {
+            UniversityApp.getError(17);
+            return null;
+        }
+        System.out.println("These are the exams conducted:");
         int i = 1;
-        for (Exam exam : exams_list) {
+        for (Exam exam : exams_cache) {
             System.out.println(i + ". " + exam.getExamDate());
             i++;
         }
-    }
-
-    public void printSessions() {
-        int i = 1;
-        for (Session session : session_list) {
-            System.out.println(i + ". " + session.getSessionTime());
-            i++;
+        System.out.println("Enter the exam number you want to select:");
+        int choice = University.getIntegerFromInput() - 1;
+        try {
+            return exams_cache.get(choice);
+        } catch (Exception e) {
+            return null;
         }
     }
 

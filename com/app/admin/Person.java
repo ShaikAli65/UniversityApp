@@ -1,9 +1,10 @@
 package app.admin;
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.StringTokenizer;
 
 import app.*;
-class Person implements University
+class Person implements University, Serializable
 {
 	protected String name;
 	protected DOB dob;

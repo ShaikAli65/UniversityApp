@@ -1,10 +1,11 @@
-package app.admin;
+package app.academics;
 
 import app.*;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Course //implements University
+public class Course implements Serializable
 {
 	final static java.util.Scanner scanner = new java.util.Scanner(System.in);
 	private String code;
@@ -19,6 +20,12 @@ public class Course //implements University
 		this.semester=0;
 	}
 
+	public Course(String name, String code, int semester, int credits) {
+		this.code = code;
+		this.name = name;
+		this.credits = credits;
+		this.semester = semester;
+	}
 	// Utility Functions
 
 	public void readData() {
@@ -53,10 +60,15 @@ public class Course //implements University
 
 	// Display Functions
 
-	public String toString()
-	{
-		return "Code : "+code+"\tName : "+name+"\tCredits : "+credits+"\t Semester : "+semester;
+	public String toString() {
+		String paddedCode = String.format("%-7s", code);
+		String paddedName = String.format("%-30s", name);
+		String paddedCredits = String.format("%-11s", credits);
+		String paddedSemester = String.format("%-10s", semester);
+	
+		return "Code : " + paddedCode + "Name : " + paddedName + "Credits : " + paddedCredits + "Semester : " + paddedSemester;
 	}
+	
 
 	@Override
 	public boolean equals(Object o) {

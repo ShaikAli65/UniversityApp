@@ -26,9 +26,17 @@ package app;
 import app.faculty.FacultyApp;
 import app.student.StudentApp;
 import app.admin.*;
+
+import java.util.Arrays;
+import java.util.List;
+
 import app.academics.*;
-public class UniversityApp implements University
-{
+import db.CourseDB;
+import db.FacultyDB;
+import db.StudentDB;
+
+
+public class UniversityApp implements University {
     public static final String Name = "I I I T - K";
     AdminApp admin = null;
     AcademicsApp academics = null;
@@ -43,24 +51,87 @@ public class UniversityApp implements University
 
     public static void main(String[] ar) {
         UniversityApp.makeClear();
+        loadInitialData();
         UniversityApp university = new UniversityApp();
         university.display();
+        // dupData();
+
+    }
+    public static void dupData() {
+        String studentFile = "C:\\Users\\7862s\\Desktop\\java\\project\\com\\storage\\studentDB.ser";
+        String facultyFile = "C:\\Users\\7862s\\Desktop\\java\\project\\com\\storage\\facultyDB.ser";
+        String courseFile = "C:\\Users\\7862s\\Desktop\\java\\project\\com\\storage\\courseDB.ser";
+         List<String> names = Arrays.asList("Aarav", "Aarush", "Abhinav", "Aditya", "Akhil", "Aryan", 
+         "Ayush", "Dhruv", "Ishaan", "Kabir", "Mohit", "Nakul", "Naman",
+          "Parth", "Pranav", "Raghav", "Rahul", "Rohit", "Sahil", "Samarth",
+           "Shivam", "Siddharth", "Vedant", "Yash", "Yuvraj", "Aaradhya", "Aarohi",
+            "Ananya", "Anika", "Anushka", "Avni", "Diya", "Ishani", "Ishika", "Ishita",
+             "Kavya", "Kiara", "Mahi", "Mehak", "Navya", "Nisha", "Pari", "Prisha", "Riya",
+              "Saumya", "Shreya", "Siya", "Tanvi", "Tanya", "Vanya", "Vidhi", "Aarav", "Aarush",
+               "Abhinav", "Aditya", "Akhil", "Aryan", "Ayush", "Dhruv", "Ishaan", "Kabir", "Mohit",
+                "Nakul", "Naman", "Parth", "Pranav", "Raghav", "Rahul", "Rohit", "Sahil", "Samarth",
+                 "Shivam", "Siddharth", "Vedant", "Yash", "Yuvraj", "Aaradhya", "Aarohi", "Ananya",
+                  "Anika", "Anushka", "Avni", "Diya", "Ishani", "Ishika", "Ishita", 
+                  "Kavya", "Kiara", "Mahi", "Mehak", "Navya", "Nisha", "Pari", "Prisha",
+                   "Riya", "Saumya", "Shreya", "Siya", "Tanvi", "Tanya", "Vanya", "Vidhi",
+                    "Aarav", "Aarush", "Abhinav", "Aditya", "Akhil", "Aryan", "Ayush", "Dhruv",
+                     "Ishaan", "Kabir", "Mohit", "Nakul", "Naman", "Parth", "Pranav");
+         var codes = new String[]{"CSE", "ECE", "EEE", "MEC"};
+        for (int i = 1; i <= 1000; i++) {
+             String name = names.get(i % 100);
+            StudentDB.add(new Student(name, i, codes[(int) (Math.random() * 10) % 4], i % 4, 4, 0));
+        }
+        for (int i = 1; i <= 1000; i++) {
+            FacultyDB.add(new Faculty(names.get(i % 100).toUpperCase() + i, codes[(int) (Math.random() * 10) % 4], i, i % 8, i, 4));
+        }
+        // a random list of 40 courses
+         List<String> courseNames = Arrays.asList("Data Structures", "Algorithms",
+          "Operating Systems", "Computer Networks", "Database Management Systems", 
+          "Software Engineering", "Computer Organization", "Computer Architecture", 
+          "Digital Logic Design", "Computer Graphics", "Artificial Intelligence",
+             "Machine Learning", "Deep Learning", "Natural Language Processing",
+              "Computer Vision", "Robotics", "Internet of Things", "Cyber Security",
+                 "Blockchain", "Quantum Computing", "Big Data", "Cloud Computing",
+                  "Mobile Computing", "Web Development", "Game Development", "Virtual Reality",
+                 "Augmented Reality", "Mixed Reality", "Data Science", "Data Analytics",
+                  "Data Mining", "Data Warehousing", "Data Visualization", "Business Intelligence",
+                     "Information Retrieval", "Information Security", "Information Privacy",
+                      "Information Theory", "Information Systems", "Information Technology",
+                     "Information Management", "Information Science");
+ 
+        for (int i = 1; i <= 40; i++) {
+            var random = (int) (Math.random() * 10) % 4;
+            CourseDB.addCourse(new Course(courseNames.get(i), codes[random] + i, i % 5, 4));
+        }
+        StudentDB.saveDatabase(studentFile);
+        FacultyDB.saveDatabase(facultyFile);
+                CourseDB.saveDatabase(courseFile);
+    }
+    
+    private static void loadInitialData() {
+        String studentFile = "C:\\Users\\7862s\\Desktop\\java\\project\\com\\storage\\studentDB.ser";
+        String facultyFile = "C:\\Users\\7862s\\Desktop\\java\\project\\com\\storage\\facultyDB.ser";
+        String courseFile = "C:\\Users\\7862s\\Desktop\\java\\project\\com\\storage\\courseDB.ser";
+        StudentDB.loadDatabase(studentFile);
+        FacultyDB.loadDatabase(facultyFile);
+        CourseDB.loadDatabase(courseFile);
     }
 
     @Override
     public String display() {
-        loop: while(true)
-        {
+        loop:
+        while (true) {
             this.printHeader("Home");
             this.showUniversityMenu();
-            switch(University.getkeyPress())
-            {
+            switch (University.getKeyPress()) {
                 case 1 -> this.AdminContext();
                 case 2 -> this.AcademicsContext();
                 case 3 -> this.FacultyContext();
                 case 4 -> this.StudentContext();
-                case 0 -> {break loop;}
-                default-> getError(6);
+                case 0 -> {
+                    break loop;
+                }
+                default -> getError(6);
             }
             makeClear();
         }
@@ -73,8 +144,7 @@ public class UniversityApp implements University
         makeClear();
         if (admin == null) {
             admin = new AdminApp();
-        }
-        else {
+        } else {
             admin.display();
         }
 
@@ -84,14 +154,13 @@ public class UniversityApp implements University
         makeClear();
         if (academics == null) {
             academics = new AcademicsApp();
-        }
-        else {
+        } else {
             academics.display();
         }
     }
 
     private void FacultyContext() {
-        if(AdminApp.Faculties.isEmpty() || AdminApp.Students.isEmpty() || AcademicsApp.courses.isEmpty()) {
+        if (FacultyDB.isEmpty() || StudentDB.isEmpty() || CourseDB.isEmpty()) {
             System.out.println("Admin & Academics should Make sure that all fields are at least filled");
             holdNextSlide();
             return;
@@ -99,14 +168,13 @@ public class UniversityApp implements University
         makeClear();
         if (facultyApp == null) {
             facultyApp = new FacultyApp();
-        }
-        else {
+        } else {
             facultyApp.display();
         }
     }
 
     private void StudentContext() {
-        if(AdminApp.Faculties.isEmpty() || AdminApp.Students.isEmpty() || AcademicsApp.courses.isEmpty()) {
+        if (FacultyDB.isEmpty() || StudentDB.isEmpty() || CourseDB.isEmpty()) {
             System.out.println("Academics && Admin should Make sure that all fields are at least filled");
             holdNextSlide();
             return;
@@ -114,8 +182,7 @@ public class UniversityApp implements University
         makeClear();
         if (student == null) {
             student = new StudentApp();
-        }
-        else {
+        } else {
             student.display();
         }
     }
@@ -135,7 +202,7 @@ public class UniversityApp implements University
     }
 
     public static void getError(int error_code) {
-        switch(error_code) {
+        switch (error_code) {
             case 1 -> System.out.println("\n\u001B[31m#ERROR://\u001B[0mEnter An Authentic Input .. error code 001\n");
 
             case 2 ->
@@ -204,13 +271,12 @@ public class UniversityApp implements University
 
             if (os.contains("Windows")) {
                 new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-            }
-            else {
+            } else {
                 System.out.print("\033[H\033[2J");
                 System.out.flush();
             }
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored) {}
     }
 
     public static void holdNextSlide() {
@@ -225,7 +291,4 @@ public class UniversityApp implements University
         System.out.println("---------------------------------------------\n");
     }
 
-    public static void loadStudentData() {
-
-    }
 }

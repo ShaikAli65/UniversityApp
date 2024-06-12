@@ -1,21 +1,19 @@
 package app.academics;
-import java.util.*;
-import java.util.stream.Stream;
 
-import app.*;
-import app.admin.*;
-import app.faculty.Exam;
+import app.University;
+import app.UniversityApp;
+import app.admin.AdminApp;
+import app.admin.Faculty;
+import app.admin.Student;
+import db.CourseDB;
+import db.ExamDB;
+import db.FacultyDB;
+import db.StudentDB;
 
+import java.util.List;
 
 public class AcademicsApp implements University {
 
-	static int c_count;
-
-	// Structures to store
-	final public static ArrayList<Course> courses = new ArrayList<>();
-	final public static HashMap<Faculty,FacultyCourse> facultyCourses = new HashMap<>();
-	final public static HashMap<Student,StudentCourse> studentCourses = new HashMap<>();
-	final public static HashMap<Course,List<Exam>> allExams = new HashMap<>();
 
 	public AcademicsApp() {
 		System.out.println("\n--------------------------------------\n");
@@ -30,12 +28,12 @@ public class AcademicsApp implements University {
 		{
 			printHeader("Home");
 			printAcademicsMenu();
-			switch(University.getkeyPress())
+			switch(University.getKeyPress())
 			{
 				case 1 -> addCourse();
 				case 2 -> displayCourses();
-				case 3 -> displayCourseChoices(1);
-				case 4 -> displayCourseChoices(2);
+				case 3 -> displayStudentCourseContext();
+				case 4 -> displayFacultyCourseContext();
 				case 5 -> addExam();
                 case 0 -> {break loop;}
                 default-> UniversityApp.getError(6);
@@ -45,81 +43,75 @@ public class AcademicsApp implements University {
         return "";
     }
 
+
+	private void displayStudentCourseContext() {
+		loop: while(true)
+		{
+			printHeader("Student-Course Context");
+			System.out.println("Choose :\n");
+			System.out.print("\t\t1. Add\t\t2. Display\t\t3. Delete\t\t(0)<-\n\t:");
+			switch(University.getKeyPress())
+			{
+				case 1 -> addStudentCourses();
+				case 2 -> displayStudentCourses();
+				case 3 -> deleteStudentCourses();
+				case 0 -> {break loop;}
+				default -> UniversityApp.getError(6);
+			}
+		}
+	}
+
+	private void displayFacultyCourseContext() {
+		loop: while(true)
+		{
+			printHeader("Faculty-Course Context");
+			System.out.println("Choose :\n");
+			System.out.print("\t\t1. Add\t\t2. Display\t\t3. Delete\t\t(0)<-\n\t:");
+			switch(University.getKeyPress())
+			{
+				case 1 -> addFacultyCourses();
+				case 2 -> displayFacultyCourses();
+				case 3 -> deleteFacultyCourses();
+				case 0 -> {break loop;}
+				default -> UniversityApp.getError(6);
+			}
+		}
+	}
 	// Utility Functions
 
 	private void addCourse() {
 		printHeader("Adding Course Details");
 		var course = new Course();
 		course.readData();
-		courses.add(course);
-		c_count++;
+		CourseDB.addCourse(course);
 	}
 
 	public void displayCourses() {
 		printHeader("Displaying Course Details");
-		if(c_count == 0){UniversityApp.getError(11);return;}
+		if(CourseDB.isEmpty()){UniversityApp.getError(11);return;}
 		printCourses();
 		UniversityApp.holdNextSlide();
 	}
 
-	public void displayCourseChoices(int in){
-		if(courses.isEmpty()){UniversityApp.getError(12);return;}
-		if(AdminApp.Students.isEmpty() && in == 1){UniversityApp.getError(9);return;}
-		if(AdminApp.Faculties.isEmpty() && in == 2){UniversityApp.getError(10);return;}
-
-		if(in == 1){
-			loop : while (true){
-				printHeader("Visiting Course Details > Student");
-				System.out.println("Choose\n ");
-				System.out.print("\t\t1. Add\t\t2. Display\t\t3.Delete\t\t(0)<-\n\t:");
-				int choice = University.getkeyPress();
-				switch(choice)
-				{
-					case 1 -> addStudentCourses();
-					case 2 -> displayStudentCourses();
-					case 3 -> deleteStudentCourses();
-					case 0 -> {break loop;}
-					default -> UniversityApp.getError(6);
-				}
-			}
-		}
-		else
-		{
-			loop : while (true)
-			{
-				printHeader("Visiting Course Details > Faculty");
-				System.out.println("Choose : \n ");
-				System.out.print("\t\t1. Add\t\t2. Display\t\t3.Delete\t\t(0)<-\n\t:");
-				int choice = University.getkeyPress();
-				switch(choice)
-				{
-					case 1 -> addFacultyCourses();
-					case 2 -> displayFacultyCourses();
-					case 3 -> deleteFacultyCourses();
-					case 0 -> {break loop;}
-					default -> UniversityApp.getError(6);
-				}
-			}
-		}
-//		UniversityApp.holdNextSlide();
-}
-
 	private void addStudentCourses() {
 		printHeader("Adding Student Courses");
 
-		if(AdminApp.Students.isEmpty()){UniversityApp.getError(9);return;}
+		if(StudentDB.isEmpty()){UniversityApp.getError(9); return;}
 		Student student = AdminApp.GetStudentChoice();
 		if (student == null) return;
+		var studentCourse = CourseDB.getCourses(student);
+		if (studentCourse == null) {
+			studentCourse = new StudentCourse(student);
+		}
 
-		StudentCourse studentCourse = new StudentCourse(student);
-		if(courses.isEmpty()){UniversityApp.getError(12);return;}
+		if(CourseDB.isEmpty()){UniversityApp.getError(12); return;}
 
 		printHeader("Adding Student Courses");
 		System.out.println("\nStudent :"+student.getName());
-		System.out.println("\nThese are the courses available in the Semester("+student.getSemester()+")\n");
+		System.out.println("\nThese are the courses available in the Semester "+student.getSemester()+"\n");
 
-		List<Course> matched_courses = courses.stream().filter(course -> course.getSemester() == student.getSemester()).distinct().toList();
-		if(matched_courses.isEmpty()){UniversityApp.getError(18);return;}
+		List<Course> matched_courses = CourseDB.getCoursesForSemester(student.getSemester());
+		if(matched_courses.isEmpty()){UniversityApp.getError(18); return;}
 
 		int choice = 1;
 		for(Course co : matched_courses)
@@ -142,25 +134,25 @@ public class AcademicsApp implements University {
 				i--;
 			}
 		}
-		studentCourses.put(student, studentCourse);
-}
+		CourseDB.updateCourse(student, studentCourse);
+	}
 
 	private void addFacultyCourses() {
 		printHeader("Adding Faculty Courses");
-		if(AdminApp.Faculties.isEmpty()){UniversityApp.getError(10);return;}
+		if(FacultyDB.isEmpty()){UniversityApp.getError(10);return;}
 
 		var faculty = AdminApp.GetFacultyChoice();
 		if(faculty == null){return;}
 
 		var facultyCourse = new FacultyCourse(faculty);
-		if(courses.isEmpty()){System.out.println("No courses Available");return;}
+		if(CourseDB.isEmpty()){System.out.println("No courses Available");return;}
 
 		printHeader("Adding Faculty Courses");
 		System.out.println("\nFaculty :" + faculty.getName());
-		printCourses();
-		System.out.println("Select the required courses : (Enter the respective index)");
+		var courses = printCourses();
+		System.out.println("Select the required courses : (Use Spaces for multiple selection)");
 
-		for(int i = 0; i < Math.min(courses.size(), faculty.getNoCourses()); i++){
+		for(int i = 0; i < Math.min(CourseDB.noOfCourses(), faculty.getNoCourses()); i++){
 			while(true){
 				try {
 					int k = University.getIntegerFromInput() - 1;
@@ -174,33 +166,33 @@ public class AcademicsApp implements University {
 				}
 			}
 		}
-		facultyCourses.put(faculty, facultyCourse);
+		CourseDB.updateCourse(faculty, facultyCourse);
 	}
 
     public void displayStudentCourses() {
 		printHeader("Displaying Student - Course Details");
-		if(AdminApp.Students.isEmpty()){
+		if(StudentDB.isEmpty()){
 			UniversityApp.getError(9);
 			return;
 		}
 		Student student = AdminApp.GetStudentChoice();
         if (student == null) {return;}
 
-		if(studentCourses.get(student) == null){UniversityApp.getError(3);return;}
+		if(CourseDB.getCourses(student) == null){UniversityApp.getError(3);return;}
 
-		System.out.print(studentCourses.get(student).toString());
+		System.out.print(CourseDB.getCourses(student).toString());
 		UniversityApp.holdNextSlide();
 	}
 
 	public void displayFacultyCourses() {
 		printHeader("Displaying Faculty - Course Details");
-		if(AdminApp.Faculties.isEmpty()){UniversityApp.getError(10);return;}
+		if(FacultyDB.isEmpty()){UniversityApp.getError(10);return;}
 
 		Faculty fac = AdminApp.GetFacultyChoice();
 		if (fac == null) {return;}
 
-		if(facultyCourses.get(fac) == null){UniversityApp.getError(4);return;}
-		System.out.print(facultyCourses.get(fac).toString());
+		if(CourseDB.getCourses(fac) == null){UniversityApp.getError(4);return;}
+		System.out.print(CourseDB.getCourses(fac).toString());
 
 		UniversityApp.holdNextSlide();
 	}
@@ -210,7 +202,7 @@ public class AcademicsApp implements University {
 
 		var student = AdminApp.GetStudentChoice();
 		if(student == null){return;}
-		var student_course = studentCourses.get(student);
+		var student_course = CourseDB.getCourses(student);
 		if(student_course == null)
 		{
 			UniversityApp.getError(3);
@@ -219,13 +211,14 @@ public class AcademicsApp implements University {
 		var course = student_course.getCourseChoice();
 		if(course == null){return;}
 		student_course.remove(course);
+		CourseDB.updateCourse(student, student_course);
 	}
 
 	private void deleteFacultyCourses() {
 		printHeader("Deleting Faculty Courses");
 		var faculty = AdminApp.GetFacultyChoice();
 		if (faculty == null) return;
-		var faculty_course = facultyCourses.get(faculty);
+		var faculty_course = CourseDB.getCourses(faculty);
 		if(faculty_course == null)
 		{
 			UniversityApp.getError(4);
@@ -234,71 +227,40 @@ public class AcademicsApp implements University {
 		var course = faculty_course.getCourseChoice();
 		if(course == null){return;}
 		faculty_course.remove(course);
+		CourseDB.updateCourse(faculty, faculty_course);
 	}
 
 	private void addExam() {
 		printHeader("Adding Exam");
-		if(courses.isEmpty()){UniversityApp.getError(12);return;}
+		if(CourseDB.isEmpty()){UniversityApp.getError(12);return;}
 		var course = getCourseChoice();
 		if(course == null){return;}
 		var date = new app.Date();
 		date.newDate();
 		var exam = new Exam(date, course);
-		if(allExams.containsKey(course)){
-			allExams.get(course).add(exam);
-		}
-		else{
-			var exams = new ArrayList<Exam>();
-			exams.add(exam);
-			allExams.put(course, exams);
-		}
-	}
-
-	// Getters
-
-	public static FacultyCourse getFacultyCourse(Faculty faculty) {
-		return facultyCourses.get(faculty);
-	}
-
-	public static StudentCourse getStudentCourse(Student student) {
-		return studentCourses.get(student);
-	}
-
-	public static Stream<Student> getStudentsWithCourse(Course course) {
-		return AdminApp.Students.stream()
-        .filter(studentCourses::containsKey)
-        .filter(student -> studentCourses.get(student).contains(course));
-	}
-
-	public static Stream<Faculty> getFacultyForCourse(Course course) {
-		return AdminApp.Faculties.stream()
-				.filter(facultyCourses::containsKey)
-				.filter(faculty -> facultyCourses.get(faculty).contains(course));
-	}
-
-	public static List<Exam> getExams(Course course) {
-		return allExams.get(course);
+		ExamDB.add(exam);
 	}
 
 	// Printers
 
-	public void printCourses() {
-		if(courses.isEmpty()){UniversityApp.getError(12);return;}
+	public List<Course> printCourses() {
+		if(CourseDB.isEmpty()){UniversityApp.getError(12);return null;}
 		System.out.println("These are the courses available :\n");
-
-		StringBuilder indexPadding = new StringBuilder();
-        indexPadding.append(" ".repeat(String.valueOf(courses.size() - 1).length()));
-
-		for(int i = 1; i <= courses.size(); i++) {
-			String index = indexPadding.substring(0, indexPadding.length() - String.valueOf(i).length()) + i;
-			System.out.println(index + ". " + courses.get(i - 1).toString());
+		List<Course> courses = CourseDB.getCourses();
+		int maxIndexDigits = String.valueOf(courses.size()).length();
+	
+		for (int i = 0; i < courses.size(); i++) {
+			String index = String.format("%" + maxIndexDigits + "s", i + 1);
+			System.out.println(index + ". " + courses.get(i).toString());
 		}
 		System.out.println();
+	
+		return courses;
 	}
 
 	public Course getCourseChoice() {
-		if(courses.isEmpty()){UniversityApp.getError(12);return null;}
-		printCourses();
+		if(CourseDB.isEmpty()){UniversityApp.getError(12);return null;}
+		var courses = printCourses();
 		System.out.print("Enter the course index to select : ");
 		int choice = University.getIntegerFromInput();
 		if(choice < 1 || choice > courses.size()){UniversityApp.getError(6);return null;}

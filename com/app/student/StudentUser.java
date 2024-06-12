@@ -1,17 +1,20 @@
 package app.student;
 
-import app.academics.AcademicsApp;
+import app.University;
+import app.UniversityApp;
+import app.academics.Course;
 import app.academics.StudentCourse;
-import app.admin.Course;
 import app.admin.Student;
-import app.*;
-import app.faculty.FacultyApp;
-import app.faculty.FacultyUser;
+import db.AttendanceDB;
+import db.CourseDB;
+import db.ExamDB;
+import db.SessionDB;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 
-public class StudentUser implements University
+public class StudentUser implements University, Serializable
 {
     final private char[] passwordArray;
     final private Student student;
@@ -28,36 +31,55 @@ public class StudentUser implements University
         return Arrays.equals(passwordArray, password);
     }
 
-    // Utility Functions
+    private StudentCourse retrieveCourses() {
+        return CourseDB.getCourses(this.student);
+    }
 
-    public void seeAttendance(StudentCourse studentCourse) {
+    public void seeAttendance() {
         printHeader("Attendance");
-
-        studentCourse.getCourses().forEach(course -> System.out.println(course.toString() + "\tAttendance: " + studentCourse.getAttendance(course)));
+        var studentEntry = AttendanceDB.getEntry(student);
+        String attendance = studentEntry.getAttendance();
+        System.out.println(attendance);
 
         System.out.print("\nEnter course code to get Detailed view or 0 to return: ");
         String courseCode = University.scanner.next().toUpperCase();
-        
         if(courseCode.equals("0")) return;
+
         printHeader("Attendance > Detailed View");
-        
-        studentCourse.getCourses().parallel()
-                .filter(course -> course.getCode().equals(courseCode))
-                .distinct()
-                .forEach(course -> System.out.println(getCourseAttendance(course)));
-        
+        var courses = retrieveCourses();
+        var choosenCourse = courses.getCourse(courseCode);
+        System.out.println(getCourseAttendance(choosenCourse));
         UniversityApp.holdNextSlide();
     }
 
-    public void seeExam(StudentCourse studentCourse) {
+    private String getCourseAttendance(Course course) {
+        StringBuilder resultString = new StringBuilder("\nAttendance for ");
+        resultString.append(course).append("\n\n");
+        var sessions = SessionDB.getSessions(course);
+
+        sessions.forEach(session ->
+                resultString.append("Session Time: ")
+                            .append(session.getTime())
+                            .append("\t: ")
+                            .append(session.getAttendance(this.student) ? "Present" : "Absent")
+                            .append("\n"));
+        return resultString.toString();
+    }
+
+    public void seeExam() {
         printHeader("Exams");
-        Course course = studentCourse.getCourseChoice();
-        var exams = AcademicsApp.getExams(course);
-        if (exams == null) {
+        var courses = retrieveCourses();
+        Course course = courses.getCourseChoice();
+        if (course == null) {
+            return;
+        }
+        var exams = ExamDB.getExams(course);
+        if (exams.isEmpty()) {
             UniversityApp.getError(11);
             return;
         }
-        printHeader("Exams > " + course.toString());
+
+        printHeader("Exams > " + course);
         int i = 1;
         for (var exam : exams) {
             System.out.println(i + ". " + exam.toString() + " Score: " + exam.getMarks(this.student));
@@ -66,6 +88,7 @@ public class StudentUser implements University
         System.out.print("\nEnter the exam number you want to select or zero to exit :");
         int choice = University.getIntegerFromInput() - 1;
         if (choice == -1) return;
+
         printHeader("Exam > Marks");
         try {
             var exam = exams.get(choice);
@@ -77,7 +100,7 @@ public class StudentUser implements University
         UniversityApp.holdNextSlide();
     }
 
-    public void generateReport(StudentCourse studentCourse) {
+    public void generateReport() {
         printHeader("Report");
         UniversityApp.holdNextSlide();
     }
@@ -87,22 +110,6 @@ public class StudentUser implements University
         UniversityApp.holdNextSlide();
     }
 
-    // Getters
-
-    private String getCourseAttendance(Course course) {
-        StringBuilder result = new StringBuilder("\nAttendance for " + course.toString() + "\n\n");
-
-        AcademicsApp.getFacultyForCourse(course).forEach(faculty -> {
-            FacultyUser facultyUser = FacultyApp.getFacultyUser(faculty);
-            if (facultyUser == null) return;
-
-            facultyUser.getSessionStream().filter(session -> session.isOfCourse(course))
-                    .forEach(session -> result.append("Session Time: ").append(session.getSessionTime())
-                    .append("\t: ").append(session.getAttendance(this.student) ? "Present" : "Absent").append("\n"));
-            });
-
-        return result.toString();
-    }
 
     // Display Functions
 

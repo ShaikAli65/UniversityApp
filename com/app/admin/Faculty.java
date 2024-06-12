@@ -2,9 +2,10 @@ package app.admin;
 
 import app.*;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Faculty extends Person
+public class Faculty extends Person implements Serializable
 {
 	private int empCode;
 	private String department;
@@ -19,7 +20,14 @@ public class Faculty extends Person
 		salary=0;
 		noCourses =0;
 	}
-
+	public Faculty(String name, String department, int empCode, int experience, int salary, int noCourses) {
+		super(name);
+		this.department = department;
+		this.empCode = empCode;
+		this.experience = experience;
+		this.salary = salary;
+		this.noCourses = noCourses;
+	}
 	// Setters and Getters
 
 	public void setDepartment(String department) {
@@ -48,12 +56,12 @@ public class Faculty extends Person
 		System.out.print("\nEnter  Name : "); this.name= scanner.next();
 		System.out.print("\nEnter  No of Teaching Courses : "); this.noCourses = University.getIntegerFromInput();
 		System.out.print("\nEmp code : "); this.empCode = University.getIntegerFromInput();
-		System.out.print("\nEnter  DOB : "); this.setDOB(scanner.next());
-		System.out.print("\nEnter  Mobile : "); this.mobile = University.getLongFromInput();
-		System.out.print("\nEnter  Email Id : "); this.emailId  = scanner.next();
-		System.out.print("\nEnter  Department : "); this.department  = scanner.next();
-		System.out.print("\nEnter  Experience : "); this.experience = University.getIntegerFromInput();
-		System.out.print("\nEnter  Salary : "); this.salary = University.getIntegerFromInput();
+//		System.out.print("\nEnter  DOB : "); this.setDOB(scanner.next());
+//		System.out.print("\nEnter  Mobile : "); this.mobile = University.getLongFromInput();
+//		System.out.print("\nEnter  Email Id : "); this.emailId  = scanner.next();
+//		System.out.print("\nEnter  Department : "); this.department  = scanner.next();
+//		System.out.print("\nEnter  Experience : "); this.experience = University.getIntegerFromInput();
+//		System.out.print("\nEnter  Salary : "); this.salary = University.getIntegerFromInput();
 		System.out.println();
 	}
 

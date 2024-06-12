@@ -1,27 +1,24 @@
 package app.admin;
 
-import app.*;
+import app.University;
+import app.UniversityApp;
 import app.faculty.FacultyApp;
 import app.student.StudentApp;
-
-import java.util.ArrayList;
+import db.FacultyDB;
+import db.StudentDB;
 
 
 public class AdminApp implements University {
 
-	private static int stu_count;
-	private static int fac_count;
-
-	// Structures to store
-	final public static ArrayList<Student> Students = new ArrayList<>();
-	final public static ArrayList<Faculty> Faculties = new ArrayList<>();
+	// private static int stu_count;
+	// private static int fac_count;
 
 	public AdminApp() {
 		System.out.println("\n----------------------------------\n");
 		System.out.println("\n\u001B[32m Welcome to Admin Dept of " + UniversityApp.Name + " \u001B[0m\n");
 		System.out.println("\n----------------------------------\n");
-		stu_count = 0;
-		fac_count = 0;
+		// stu_count = 0;
+		// fac_count = 0;
 		display();
 	}
 
@@ -30,7 +27,7 @@ public class AdminApp implements University {
 		loop: while(true)
 		{
 			showAdminMenu();
-			switch(University.getkeyPress())
+			switch(University.getKeyPress())
 			{
 				case 1  -> addStudent();
 				case 2  -> addFaculty();
@@ -45,12 +42,7 @@ public class AdminApp implements University {
 			}
 			UniversityApp.makeClear();
 		}
-		storeData();
 		return "";
-}
-
-	private void storeData() {
-
 	}
 
 	// Utility Functions
@@ -59,18 +51,18 @@ public class AdminApp implements University {
 		printHeader("Entering the Faculty Details");
 		var faculty = new Faculty();
 		faculty.readData();
-		Faculties.add(faculty);
+		FacultyDB.add(faculty);
 		FacultyApp.AddNewFaculty(faculty);
-		fac_count += 1;
+		// fac_count += 1;
 	}
 
 	private void addStudent() {
 		printHeader("Entering the Student Details");
 		var student = new Student();
 		student.readData();
-		Students.add(student);
-		StudentApp.AddNewStudent(student);
-		stu_count += 1;
+		StudentDB.add(student);
+		StudentApp.addNewStudent(student);
+		// stu_count += 1;
 	}
 
 	void updateStudent()   {
@@ -110,6 +102,7 @@ public class AdminApp implements University {
 				}
 			System.out.println("Updated Data :");
 			System.out.println(student.display());
+			StudentDB.update(student);
 			UniversityApp.holdNextSlide();
 		}
 	}
@@ -163,27 +156,28 @@ public class AdminApp implements University {
 		}
 		System.out.println("Updated Data :");
 		System.out.println(faculty.display());
+		FacultyDB.update(faculty);
 		UniversityApp.holdNextSlide();
 	}
 
 	void deleteStudent()  {
 		printHeader("Deleting Student Details");
-		if(stu_count == 0){UniversityApp.getError(9);return;}
+		// if(stu_count == 0){UniversityApp.getError(9);return;}
 		var student = GetStudentChoice();
 		if(student == null){return;}
-		AdminApp.Students.remove(student);
-		StudentApp.RemoveStudent(student);
-		stu_count -= 1;
+		StudentDB.remove(student);
+		StudentApp.removeStudent(student);
+		// stu_count -= 1;
 	}
 
 	void deleteFaculty()  {
 		printHeader("Deleting Faculty Details");
-		if(fac_count == 0){UniversityApp.getError(10);return;}
+		// if(fac_count == 0){UniversityApp.getError(10);return;}
 		var faculty = GetFacultyChoice();
 		if (faculty == null) {return;}
-		AdminApp.Faculties.remove(faculty);
+		FacultyDB.remove(faculty);
 		FacultyApp.RemoveFaculty(faculty);
-		fac_count -= 1;
+		// fac_count -= 1;
 	}
 
 	// Getters
@@ -191,13 +185,20 @@ public class AdminApp implements University {
 	public static Student GetStudentChoice() {
 
 		System.out.println("Choose one Student");
-		ShowSubStudentList();
-		System.out.print("\n\t : ");
+		var students = StudentDB.getStudents();
+		int i = 1;
+		for (var student : students) {
+			System.out.println(i + ". " + student.getName());
+			i++;
+		}
+		System.out.print("\n\t index (Enter zero to return): ");
 
 		int id = University.getIntegerFromInput() - 1;
-
+		if (id == -1) {
+			return null;
+		}
 		try {
-			return Students.get(id);
+			return students.get(id);
 		} catch (IndexOutOfBoundsException ignored) {
 			UniversityApp.getError(7);
 			return null;
@@ -206,13 +207,19 @@ public class AdminApp implements University {
 
 	public static Faculty GetFacultyChoice() {
 		System.out.println("Choose one Faculty");
-		ShowSubFacultyList();
-		System.out.print("\n\tYour Choice : ");
-
+		var faculties = FacultyDB.getFaculties();
+		int i = 1;
+		for (var faculty : faculties) {
+			System.out.println(i + ". " + faculty.getName());
+			i++;
+		}
+		System.out.print("\n\tYour Choice (Enter zero to return): ");
 		int id = University.getIntegerFromInput() - 1;
-
+		if (id == -1) {
+			return null;
+		}
 		try {
-			return Faculties.get(id);
+			return faculties.get(id);
 		} catch (IndexOutOfBoundsException ignored) {
 			UniversityApp.getError(8);
 			return null;
@@ -221,55 +228,43 @@ public class AdminApp implements University {
 
 	// Display Functions
 
-	public static void ShowSubFacultyList() {
-		if(Faculties.isEmpty())
-		{
-			UniversityApp.getError(10);
-			return;
-		}
-		int i = 1;
-		for(var facutly: Faculties)
-		{
-			System.out.println("\n\t\t" + i + ". " + facutly.getName());
-			i++;
-		}
-	}
-
-	public static void ShowSubStudentList() {
-		if(Students.isEmpty())
-		{
-			UniversityApp.getError(10);
-			return;
-		}
-		int i = 1;
-		for(var student : Students){
-			System.out.print("\n\t\t" + i + ". " +  student.getName());
-			i++;
-		}
-	}
 
 	void displayStudent() {
 		printHeader("Displaying the Student Details");
-		if (stu_count == 0) {UniversityApp.getError(9);return;}
+		// if (stu_count == 0) {
+		// 	UniversityApp.getError(9);
+		// 	return;
+		// }
+		while (true) {
+			printHeader("Displaying the Student Details");
+			var student = GetStudentChoice();
+			if (student == null) {
+				return;
+			}
 
-		var student = GetStudentChoice();
-		if (student == null) {return;}
-
-		System.out.println(student.display());
-		UniversityApp.holdNextSlide();
+			printHeader("Displaying the Student Details");
+			System.out.println(student.display());
+			UniversityApp.holdNextSlide();
+		}
 	}
-
 	void displayFaculty() {
 		printHeader("Displaying the Faculty Details");
-		if(fac_count == 0){UniversityApp.getError(10);return;}
+		// if (fac_count == 0) {
+		// 	UniversityApp.getError(10);
+		// 	return;
+		// }
+		while (true) {
+			printHeader("Displaying the Faculty Details");
+			var fac = GetFacultyChoice();
+			if (fac == null) {
+				return;
+			}
 
-		var fac = GetFacultyChoice();
-		if(fac == null){return;}
-
-		System.out.println(fac.display());
-		UniversityApp.holdNextSlide();
+			printHeader("Displaying the Faculty Details");
+			System.out.println(fac.display());
+			UniversityApp.holdNextSlide();
+		}
 	}
-
 	private static void showAdminMenu() {
 		System.out.print("""
                 Choose :\

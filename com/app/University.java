@@ -1,6 +1,8 @@
 package app;
 import java.io.Console;
 import java.util.Scanner;
+
+
 public interface University
 {
 	Scanner scanner =new Scanner(System.in).useDelimiter(System.lineSeparator());
@@ -56,19 +58,20 @@ public interface University
 		}
 	}
 
-	static int getkeyPress() {
+	static int getKeyPress() {
 		return getIntegerFromInput();
-		while (true) {
-			try {
-				int integer = Integer.parseInt(AppKeyListener.getKeyPressed());
-				if (integer < 0) {
-					throw new Exception();
-				}
-				return integer;
-			} catch (Exception e) {
-				UniversityApp.getError(1);
-			}
-		}
+/*		while (true) {
+  			try {
+  				int integer = Integer.parseInt(AppKeyListener.getKeyPressed());
+  				if (integer < 0) {
+  					throw new Exception();
+  				}
+  				return integer;
+  			} catch (Exception e) {
+  				UniversityApp.getError(1);
+  			}
+  		}
+*/
 	}
 
 	void printHeader(String out);

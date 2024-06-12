@@ -19,7 +19,14 @@ public class  Student extends Person
 		no_courses=0;
 		cgpa=0;
 	}
-
+	public Student(String name, int rollNo, String branch, int semester, int no_courses, double cgpa) {
+		super(name);
+		this.rollNo = rollNo;
+		this.branch = branch;
+		this.semester = semester;
+		this.no_courses = no_courses;
+		this.cgpa = cgpa;
+	}
 	// Getters
 
 	public int getRollNo() {return rollNo;}
@@ -45,10 +52,10 @@ public class  Student extends Person
 		System.out.print("\nEnter  Roll No : "); this.rollNo = University.getIntegerFromInput();
 		System.out.print("\nEnter  Semester : "); this.semester = University.getIntegerFromInput();
 		System.out.print("\nEnter  No of Courses : "); this.no_courses = University.getIntegerFromInput();
-		System.out.print("\nEnter  DOB : "); this.setDOB(scanner.next());
-		System.out.print("\nEnter  Mobile : "); this.mobile = University.getLongFromInput();
-		System.out.print("\nEnter  Email Id : "); this.emailId= scanner.next();
-		System.out.print("\nEnter  Branch : "); this.branch = scanner.next();
+//		System.out.print("\nEnter  DOB : "); this.setDOB(scanner.next());
+//		System.out.print("\nEnter  Mobile : "); this.mobile = University.getLongFromInput();
+//		System.out.print("\nEnter  Email Id : "); this.emailId= scanner.next();
+//		System.out.print("\nEnter  Branch : "); this.branch = scanner.next();
 	}
 
 	@Override

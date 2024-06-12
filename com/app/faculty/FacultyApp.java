@@ -1,15 +1,14 @@
 package app.faculty;
 
-import app.*;
-import app.academics.AcademicsApp;
-import app.admin.*;
-
-import java.util.*;
+import app.University;
+import app.UniversityApp;
+import app.admin.AdminApp;
+import app.admin.Faculty;
+import db.UserHandlesDB;
 
 
 public class FacultyApp implements University {
 
-    final private static HashMap<Faculty, FacultyUser> FacultyUserHashMap = new HashMap<>();
 
     public FacultyApp() {
         System.out.println("\n----------------------------------\n");
@@ -27,15 +26,12 @@ public class FacultyApp implements University {
         var facultyUser = getFacultyHandle(faculty);
         if (facultyUser == null) {UniversityApp.getError(15);return null;}
 
-        var facultyCourse = AcademicsApp.getFacultyCourse(faculty);
-        if (facultyCourse == null) {UniversityApp.getError(4);return null;}
-
         loop: while(true) {
             printHeader(faculty.getName() + " is logged in");
             ShowFacultyAppMenu();
-            switch (University.getkeyPress()) {
-                case 1 -> facultyUser.addSession(facultyCourse);
-                case 2 -> facultyUser.enterExamData(facultyCourse);
+            switch (University.getKeyPress()) {
+                case 1 -> facultyUser.addSession();
+                case 2 -> facultyUser.enterExamData();
                 case 3 -> facultyUser.deleteSession();
                 case 4 -> facultyUser.deleteExam();
                 case 5 -> facultyUser.updateSession();
@@ -58,21 +54,21 @@ public class FacultyApp implements University {
     // Utility Functions
 
     public static void AddNewFaculty(Faculty faculty) {
-        FacultyUserHashMap.put(faculty, new FacultyUser(faculty));
+        UserHandlesDB.add(faculty);
     }
 
     public static void RemoveFaculty(Faculty faculty) {
-        FacultyUserHashMap.remove(faculty);
+        UserHandlesDB.remove(faculty);
     }
 
     // Getters and Setters
 
-    public static FacultyUser getFacultyUser(Faculty faculty) {
-        return FacultyUserHashMap.get(faculty);
+    private FacultyUser getFacultyHandle(Faculty faculty) {
+        FacultyUser userHandle = UserHandlesDB.getHandle(faculty);
+        return authenticate(userHandle);
     }
 
-    private FacultyUser getFacultyHandle(Faculty faculty) {
-        FacultyUser userHandle = FacultyUserHashMap.get(faculty);
+    private FacultyUser authenticate(FacultyUser userHandle) {
         int retryCount = 3;
 
         while (retryCount > 0) {
@@ -85,10 +81,8 @@ public class FacultyApp implements University {
                 System.out.print("retries left : " + (--retryCount));
             }
         }
-
         return null;
-}
-
+    }
     // Print Functions
 
     private static void ShowFacultyAppMenu() {

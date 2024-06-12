@@ -3,7 +3,7 @@ import java.util.Objects;
 
 public class Time
 {
-    public Date date;
+    final public Date date;
     public int start;
 
     public Time(){
@@ -17,7 +17,7 @@ public class Time
     }
 
     public String toString() {
-        return date.toString() + "\t" + start + "Hrs";
+        return date + "\t" + start + "Hrs";
     }
 
     public void addTime(){

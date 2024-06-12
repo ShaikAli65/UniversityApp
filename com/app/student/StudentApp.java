@@ -2,15 +2,12 @@ package app.student;
 
 import app.University;
 import app.UniversityApp;
-import app.academics.AcademicsApp;
 import app.admin.AdminApp;
 import app.admin.Student;
-import java.util.HashMap;
 
+import db.UserHandlesDB;
 
 public class StudentApp implements University {
-
-    final private static HashMap<Student, StudentUser> studentUserHashMap = new HashMap<>();
 
     public StudentApp(){
         System.out.println("\n----------------------------------\n");
@@ -27,16 +24,13 @@ public class StudentApp implements University {
         var studentUser = getStudentHandle(student);
         if (studentUser == null) {UniversityApp.getError(15);return null;}
 
-        var studentCourse = AcademicsApp.getStudentCourse(student);
-        if (studentCourse == null) {UniversityApp.getError(3);return null;}
-
         loop: while(true) {
             printHeader(student.getName() + " is logged in");
             showStudentMenu();
-            switch (University.getkeyPress()) {
-                case 1 -> studentUser.seeAttendance(studentCourse);
-                case 2 -> studentUser.seeExam(studentCourse);
-                case 3 -> studentUser.generateReport(studentCourse);
+            switch (University.getKeyPress()) {
+                case 1 -> studentUser.seeAttendance();
+                case 2 -> studentUser.seeExam();
+                case 3 -> studentUser.generateReport();
                 case 4 -> studentUser.generateFullReport();
                 case 0 -> {break loop;}
                 default-> UniversityApp.getError(6);
@@ -47,20 +41,23 @@ public class StudentApp implements University {
 
     // Utility Functions
 
-    public static void AddNewStudent(Student student) {
-        studentUserHashMap.put(student, new StudentUser(student));
+    public static void addNewStudent(Student student) {
+        UserHandlesDB.add(student);
     }
 
-    public static void RemoveStudent(Student student) {
-        studentUserHashMap.remove(student);
+    public static void removeStudent(Student student) {
+        UserHandlesDB.remove(student);
     }
 
     // Getters
 
     private StudentUser getStudentHandle(Student student) {
-        StudentUser userHandle = studentUserHashMap.get(student);
-        int retryCount = 3;
+        StudentUser userHandle = UserHandlesDB.getHandle(student);
+        return authenticate(userHandle);
+    }
 
+    private StudentUser authenticate(StudentUser userHandle) {
+        int retryCount = 3;
         while (retryCount > 0) {
             if (userHandle != null && userHandle.authenticate()) {
                 return userHandle;
@@ -71,7 +68,6 @@ public class StudentApp implements University {
                 System.out.print("retries left : " + (--retryCount));
             }
         }
-
         return null;
     }
 

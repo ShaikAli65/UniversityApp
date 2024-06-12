@@ -1,7 +1,7 @@
 package app.student;
 import app.*;
 import app.Date;
-import app.admin.Course;
+import app.academics.Course;
 import java.util.*;
 
 
