@@ -7,7 +7,6 @@ import java.util.Objects;
 
 public class Course implements Serializable
 {
-	final static java.util.Scanner scanner = new java.util.Scanner(System.in);
 	private String code;
 	private String name;
 	private int credits;
@@ -29,8 +28,8 @@ public class Course implements Serializable
 	// Utility Functions
 
 	public void readData() {
-		System.out.print("\nEnter  Course Code : ");String code = scanner.next();
-		System.out.print("\nEnter  name : ");String name = scanner.next();
+		System.out.print("\nEnter  Course Code : ");String code = University.scanner.next();
+		System.out.print("\nEnter  name : ");String name = University.scanner.next();
 		System.out.print("\nEnter  Credits : ");
 		this.credits = University.getIntegerFromInput();
 		System.out.print("\nEnter  Semester : ");
@@ -66,7 +65,7 @@ public class Course implements Serializable
 		String paddedCredits = String.format("%-11s", credits);
 		String paddedSemester = String.format("%-10s", semester);
 	
-		return "Code : " + paddedCode + "Name : " + paddedName + "Credits : " + paddedCredits + "Semester : " + paddedSemester;
+		return paddedCode +  paddedName + "Credits: " + paddedCredits + "Semester: " + paddedSemester;
 	}
 	
 
