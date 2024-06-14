@@ -1,8 +1,8 @@
 package app.faculty;
 
+import app.Choices;
 import app.University;
 import app.UniversityApp;
-import app.admin.AdminApp;
 import app.admin.Faculty;
 import db.UserHandlesDB;
 
@@ -20,7 +20,7 @@ public class FacultyApp implements University {
     @Override
     public String display() {
 
-        Faculty faculty = AdminApp.GetFacultyChoice();
+        Faculty faculty = Choices.getFaculty("FacultyApp > Logging");
         if (faculty == null) {return null;}
 
         var facultyUser = getFacultyHandle(faculty);
@@ -36,14 +36,8 @@ public class FacultyApp implements University {
                 case 4 -> facultyUser.deleteExam();
                 case 5 -> facultyUser.updateSession();
                 case 6 -> facultyUser.updateExam();
-                case 7 -> {
-                    facultyUser.displaySessions();
-                    UniversityApp.holdNextSlide();
-                }
-                case 8 -> {
-                    facultyUser.displayExams();
-                    UniversityApp.holdNextSlide();
-                }
+                case 7 -> facultyUser.displaySessions();
+                case 8 -> facultyUser.displayExams();
                 case 0 -> {break loop;}
                 default-> UniversityApp.getError(6);
             }
@@ -54,10 +48,11 @@ public class FacultyApp implements University {
     // Utility Functions
 
     public static void AddNewFaculty(Faculty faculty) {
-        UserHandlesDB.add(faculty);
+        var passwordArray = University.getPasswordFromInput();
+        UserHandlesDB.add(faculty, passwordArray);
     }
 
-    public static void RemoveFaculty(Faculty faculty) {
+    public static void remove(Faculty faculty) {
         UserHandlesDB.remove(faculty);
     }
 

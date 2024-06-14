@@ -1,28 +1,31 @@
 package app.academics;
 
-import app.University;
-import app.UniversityApp;
-import app.admin.*;
+import app.admin.Student;
+import db.CourseDB;
 
-import java.io.Serializable;
-import java.util.ArrayList;
+import java.io.*;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class StudentCourse implements Serializable
 {
-	// Structure to store the courses registered by the student
-	final List<Course> courses;
+	@Serial
+	private static final long serialVersionUID = 1L;
+	private transient HashSet<Course> courses;
 
 	private int count;
 	private final int noCourses;
 
 	public StudentCourse(Student student) {
 		noCourses = student.getNoCourses();
-		courses = new ArrayList<>(noCourses);
+		courses = new HashSet<>(noCourses);
 		count = 0;
 	}
-
+	public StudentCourse(Student student, HashSet<Course> courses) {
+		noCourses = student.getNoCourses();
+		this.courses = courses;
+		count = courses.size();
+	}
 	// Course methods
 
 	public void add(Course c) {
@@ -59,60 +62,50 @@ public class StudentCourse implements Serializable
 	// Utility methods
 	@Override
 	public String toString() {
-		return display();
-	}
-
-	public String display() {
-		StringBuilder result = new StringBuilder("\nRegistered Courses :\n\n");
+		StringBuilder result = new StringBuilder();
+		String padding = "%" + String.valueOf(this.getNoCourses()).length() + "s";
 		int i = 1;
-		for (Course course : courses) {
-			result.append(i).append(". ").append(course.toString()).append("\n");
+		for(var course : courses) {
+			result.append(String.format(padding, i)).append(". ").append(course).append('\n');
+			i++;
 		}
 		return result.toString();
 	}
 
-	// getters
-
-	public Course getCourseChoice() {
-
-		if (courses.isEmpty()) {
-			UniversityApp.getError(11);
-			return null;
-		}
-
-		// Display the list of courses
-		System.out.println("Courses registered by the student\n");
-		int index = 1;
-		for (Course course : courses) {
-			System.out.println(index + ". " + course.toString());
-			index++;
-		}
-
-		// Get user input for course choice
-		System.out.print("\nEnter the course index or zero to return: ");
-		int choiceIndex = University.getIntegerFromInput() - 1;
-
-		// Validate user input
-		if (choiceIndex < 0 || choiceIndex >= courses.size()) {
-			System.out.println("Invalid choice");
-			return null;
-		}
-
-		Course[] courseArray = courses.toArray(new Course[0]);
-		return courseArray[choiceIndex];
+	public void display() {
+		System.out.println(this);
 	}
 
-	public Stream<Course> getCourses() {
-		return courses.stream();
+	public List<Course> getCourses() {
+		return courses.stream().toList();
 	}
 	public Course getCourse(String code) {
 		return courses.stream()
-				.filter(course -> course.getCode().equals(code))
+				.filter(course -> course.getCode().equalsIgnoreCase(code))
 				.findFirst()
 				.orElse(null);
 	}
 	public int getNoCourses() {
 		return noCourses;
 	}
+    @Serial
+	private void writeObject(ObjectOutputStream oos) throws IOException {
+        oos.defaultWriteObject();
+        oos.writeInt(courses.size());
+        for (Course course : courses) {
+            oos.writeObject(course.getCode());
+        }
+    }
 
+    @Serial
+	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+        ois.defaultReadObject();
+        int size = ois.readInt();
+        this.courses = new HashSet<>(size);
+        for (int i = 0; i < size; i++) {
+            String courseCode = (String) ois.readObject();
+            Course course = CourseDB.get(courseCode);
+            courses.add(course);
+        }
+    }
 }

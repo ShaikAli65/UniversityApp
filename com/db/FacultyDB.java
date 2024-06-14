@@ -3,42 +3,43 @@ package db;
 import app.admin.Faculty;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.stream.Stream;
 
 
-public class FacultyDB implements ContainerInterface{
-    private static final ArrayList<Faculty> faculties = new ArrayList<>();
+public class FacultyDB {
+    private static final HashMap<String, Faculty> faculties = new HashMap<>();
     public static boolean isEmpty() {
         return faculties.isEmpty();
     }
     public static void add(Faculty faculty) {
-        faculties.add(faculty);
+        faculties.put(faculty.getEmpCode(), faculty);
     }
     public static void update(Faculty faculty) {
-
+        faculties.put(faculty.getEmpCode(), faculty);
     }
     public static void remove(Faculty faculty) {
-        faculties.remove(faculty);
+        faculties.remove(faculty.getEmpCode());
     }
-    public static List<Faculty> getFaculties() {
-        return faculties;
+    public static Stream<Faculty> getFaculties() {
+        return faculties.values().parallelStream();
+    }
+    public static Faculty getFaculty(String empCode) {
+        return faculties.get(empCode);
     }
 
+    @SuppressWarnings("unchecked")
     public static void loadDatabase(String fileName) {
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName))) {
-            faculties.clear(); // Clear existing data
-            faculties.addAll((ArrayList<Faculty>) inputStream.readObject());
-        } catch (IOException | ClassNotFoundException e) {
-//            e.printStackTrace();
-        }
+            faculties.clear();
+            faculties.putAll((HashMap<String, Faculty>) inputStream.readObject());
+        } catch (IOException | ClassNotFoundException ignored) {}
     }
 
-    public static void saveDatabase(String fileName) {
+    public static void saveData(String fileName) {
         try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileName))) {
             outputStream.writeObject(faculties);
-        } catch (IOException e) {
-//            e.printStackTrace();
-        }
+        } catch (IOException ignored) {}
+        System.out.println("Faculty Data Saved");
     }
 }

@@ -1,24 +1,19 @@
 package app.admin;
 
+import app.Choices;
 import app.University;
 import app.UniversityApp;
 import app.faculty.FacultyApp;
 import app.student.StudentApp;
-import db.FacultyDB;
-import db.StudentDB;
+import db.*;
 
 
 public class AdminApp implements University {
-
-	// private static int stu_count;
-	// private static int fac_count;
 
 	public AdminApp() {
 		System.out.println("\n----------------------------------\n");
 		System.out.println("\n\u001B[32m Welcome to Admin Dept of " + UniversityApp.Name + " \u001B[0m\n");
 		System.out.println("\n----------------------------------\n");
-		// stu_count = 0;
-		// fac_count = 0;
 		display();
 	}
 
@@ -45,15 +40,12 @@ public class AdminApp implements University {
 		return "";
 	}
 
-	// Utility Functions
-
 	private void addFaculty() {
 		printHeader("Entering the Faculty Details");
 		var faculty = new Faculty();
 		faculty.readData();
 		FacultyDB.add(faculty);
 		FacultyApp.AddNewFaculty(faculty);
-		// fac_count += 1;
 	}
 
 	private void addStudent() {
@@ -62,17 +54,15 @@ public class AdminApp implements University {
 		student.readData();
 		StudentDB.add(student);
 		StudentApp.addNewStudent(student);
-		// stu_count += 1;
 	}
 
 	void updateStudent()   {
-		printHeader("Updating Student Details (not recommended)");
-		var student = GetStudentChoice();
+		var student = Choices.getStudent("Updating Student Details (not recommended)");
 		if (student == null){return;}
-		printHeader("Updating Student Details > " + student.getName());
-		System.out.println(student.display());
-		System.out.print("Choose the serial number of category to Update or zero to return: ");
 		loop : while (true) {
+		printHeader("Updating Student Details > " + student.getName());
+			System.out.println(student.display());
+			System.out.print("Choose the serial number of category to Update or zero to return: ");
 			switch(University.getIntegerFromInput())
 			{
 				case 1: System.out.print("Enter the new Name :");
@@ -100,21 +90,17 @@ public class AdminApp implements University {
 				break;
 				case 0: break loop;
 				}
-			System.out.println("Updated Data :");
-			System.out.println(student.display());
-			StudentDB.update(student);
-			UniversityApp.holdNextSlide();
 		}
+		StudentDB.update(student);
 	}
 
 	void updateFaculty()   {
-		printHeader("Updating Faculty Details (not recommended)");
-		var faculty = GetFacultyChoice();
+		var faculty = Choices.getFaculty("Updating Faculty Details (not recommended)");
 		if (faculty == null){return;}
-		printHeader("Updating Faculty Details > " + faculty.getName());
-		System.out.println(faculty.display());
-		System.out.print("Choose the serial number of category to Update or zero to return:");
 		loop: while (true) {
+			printHeader("Updating Faculty Details > " + faculty.getName());
+			System.out.println(faculty.display());
+			System.out.print("Choose the serial number of category to Update or zero to return:");
 			switch (University.getIntegerFromInput()) {
 				case 1:
 					System.out.print("Enter the new Name: ");
@@ -154,94 +140,33 @@ public class AdminApp implements University {
 				case 0: break loop;
 			}
 		}
-		System.out.println("Updated Data :");
-		System.out.println(faculty.display());
 		FacultyDB.update(faculty);
-		UniversityApp.holdNextSlide();
 	}
 
 	void deleteStudent()  {
-		printHeader("Deleting Student Details");
-		// if(stu_count == 0){UniversityApp.getError(9);return;}
-		var student = GetStudentChoice();
+		var student = Choices.getStudent("Deleting Student Details");
 		if(student == null){return;}
+		printHeader("Deleting Student Details");
 		StudentDB.remove(student);
 		StudentApp.removeStudent(student);
-		// stu_count -= 1;
+		AttendanceDB.remove(student);
+		SessionDB.remove(student);
+		ExamDB.remove(student);
 	}
 
 	void deleteFaculty()  {
-		printHeader("Deleting Faculty Details");
-		// if(fac_count == 0){UniversityApp.getError(10);return;}
-		var faculty = GetFacultyChoice();
+		var faculty = Choices.getFaculty("Deleting Faculty Details");
 		if (faculty == null) {return;}
+		printHeader("Deleting Faculty Details");
 		FacultyDB.remove(faculty);
-		FacultyApp.RemoveFaculty(faculty);
-		// fac_count -= 1;
+		FacultyApp.remove(faculty);
 	}
-
-	// Getters
-
-	public static Student GetStudentChoice() {
-
-		System.out.println("Choose one Student");
-		var students = StudentDB.getStudents();
-		int i = 1;
-		for (var student : students) {
-			System.out.println(i + ". " + student.getName());
-			i++;
-		}
-		System.out.print("\n\t index (Enter zero to return): ");
-
-		int id = University.getIntegerFromInput() - 1;
-		if (id == -1) {
-			return null;
-		}
-		try {
-			return students.get(id);
-		} catch (IndexOutOfBoundsException ignored) {
-			UniversityApp.getError(7);
-			return null;
-		}
-	}
-
-	public static Faculty GetFacultyChoice() {
-		System.out.println("Choose one Faculty");
-		var faculties = FacultyDB.getFaculties();
-		int i = 1;
-		for (var faculty : faculties) {
-			System.out.println(i + ". " + faculty.getName());
-			i++;
-		}
-		System.out.print("\n\tYour Choice (Enter zero to return): ");
-		int id = University.getIntegerFromInput() - 1;
-		if (id == -1) {
-			return null;
-		}
-		try {
-			return faculties.get(id);
-		} catch (IndexOutOfBoundsException ignored) {
-			UniversityApp.getError(8);
-			return null;
-		}
-	}
-
-	// Display Functions
-
 
 	void displayStudent() {
 		printHeader("Displaying the Student Details");
-		// if (stu_count == 0) {
-		// 	UniversityApp.getError(9);
-		// 	return;
-		// }
 		while (true) {
-			printHeader("Displaying the Student Details");
-			var student = GetStudentChoice();
-			if (student == null) {
-				return;
-			}
-
+			var student = Choices.getStudent("Displaying the Student Details");
+			if (student == null) {return;}
 			printHeader("Displaying the Student Details");
 			System.out.println(student.display());
 			UniversityApp.holdNextSlide();
@@ -249,17 +174,9 @@ public class AdminApp implements University {
 	}
 	void displayFaculty() {
 		printHeader("Displaying the Faculty Details");
-		// if (fac_count == 0) {
-		// 	UniversityApp.getError(10);
-		// 	return;
-		// }
 		while (true) {
-			printHeader("Displaying the Faculty Details");
-			var fac = GetFacultyChoice();
-			if (fac == null) {
-				return;
-			}
-
+			var fac = Choices.getFaculty("Displaying the Faculty Details");
+			if (fac == null) {return;}
 			printHeader("Displaying the Faculty Details");
 			System.out.println(fac.display());
 			UniversityApp.holdNextSlide();
@@ -281,7 +198,6 @@ public class AdminApp implements University {
                 \t:""");
 	}
 
-	@Override
 	public void printHeader(String s) {
 		UniversityApp.makeClear();
 		System.out.println("------------------Admin panel------------------");

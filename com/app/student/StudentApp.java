@@ -1,10 +1,9 @@
 package app.student;
 
+import app.Choices;
 import app.University;
 import app.UniversityApp;
-import app.admin.AdminApp;
 import app.admin.Student;
-
 import db.UserHandlesDB;
 
 public class StudentApp implements University {
@@ -18,7 +17,7 @@ public class StudentApp implements University {
 
     @Override
     public String display() {
-        Student student = AdminApp.GetStudentChoice();
+        Student student = Choices.getStudent("Student App > login");
         if (student == null) {return null;}
 
         var studentUser = getStudentHandle(student);
@@ -42,7 +41,8 @@ public class StudentApp implements University {
     // Utility Functions
 
     public static void addNewStudent(Student student) {
-        UserHandlesDB.add(student);
+        var passwordArray = University.getPasswordFromInput();
+        UserHandlesDB.add(student, passwordArray);
     }
 
     public static void removeStudent(Student student) {

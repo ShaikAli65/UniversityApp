@@ -1,11 +1,9 @@
 package app;
 
 import java.util.Objects;
-import java.util.Scanner;
 
-public class Date
+public class Date implements java.io.Serializable, Comparable<Date>
 {
-    final Scanner sc=new Scanner(System.in);
     private int day=0;
     private int month=0;
     private int year=0;
@@ -14,7 +12,7 @@ public class Date
 
     }
 
-    Date(int day, int month, int year)
+    public Date(int day, int month, int year)
     {
         this.day=day; 
         this.month=month;
@@ -23,7 +21,7 @@ public class Date
 
     public void newDate(){
         System.out.print("Enter DD/MM/YYYY\t:");
-        String x = sc.next();
+        String x = UniversityApp.scanner.next();
         String[] ar = x.split("/");
         try {
             day=Integer.parseInt(ar[0]);
@@ -53,7 +51,15 @@ public class Date
         Date date = (Date) o;
         return day == date.day && month == date.month && year == date.year;
     }
-
+    public int compareTo(Date other) {
+        if (this.year != other.year) {
+            return Integer.compare(this.year, other.year);
+        }
+        if (this.month != other.month) {
+            return Integer.compare(this.month, other.month);
+        }
+        return Integer.compare(this.day, other.day);
+    }
     @Override
     public int hashCode() {
         return Objects.hash(day, month, year);

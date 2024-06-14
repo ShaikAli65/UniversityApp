@@ -2,25 +2,24 @@ package app.admin;
 
 import app.*;
 
-import java.io.Serializable;
 import java.util.Objects;
 
-public class Faculty extends Person implements Serializable
+public class Faculty extends Person
 {
-	private int empCode;
+	private String empCode;
 	private String department;
 	private int experience;
 	private int salary;
 	private int noCourses;
 
 	protected Faculty() {
-		empCode =0;
+		empCode = "";
 		department="";
 		experience=0;
 		salary=0;
 		noCourses =0;
 	}
-	public Faculty(String name, String department, int empCode, int experience, int salary, int noCourses) {
+	public Faculty(String name, String department, String empCode, int experience, int salary, int noCourses) {
 		super(name);
 		this.department = department;
 		this.empCode = empCode;
@@ -33,7 +32,7 @@ public class Faculty extends Person implements Serializable
 	public void setDepartment(String department) {
 		this.department = department;
 	}
-	public void setEmpCode(int empCode) {
+	public void setEmpCode(String empCode) {
 		this.empCode = empCode;
 	}
 	public void setExperience(int experience) {
@@ -45,17 +44,22 @@ public class Faculty extends Person implements Serializable
 	public void setSalary(int salary) {
 		this.salary = salary;
 	}
-
+	public String getEmpCode() {
+		return this.empCode;
+	}
 	public int getNoCourses() {
 		return this.noCourses;
 	}
 
+	public String getDepartment() {
+		return department;
+	}
 	// Utility functions
 
 	public void readData() {
 		System.out.print("\nEnter  Name : "); this.name= scanner.next();
 		System.out.print("\nEnter  No of Teaching Courses : "); this.noCourses = University.getIntegerFromInput();
-		System.out.print("\nEmp code : "); this.empCode = University.getIntegerFromInput();
+		System.out.print("\nEmp code : "); this.empCode = scanner.next();
 //		System.out.print("\nEnter  DOB : "); this.setDOB(scanner.next());
 //		System.out.print("\nEnter  Mobile : "); this.mobile = University.getLongFromInput();
 //		System.out.print("\nEnter  Email Id : "); this.emailId  = scanner.next();
@@ -70,7 +74,7 @@ public class Faculty extends Person implements Serializable
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Faculty faculty = (Faculty) o;
-		return empCode == faculty.empCode; // && Objects.equals(department, faculty.department);
+		return Objects.equals(empCode, faculty.empCode); // && Objects.equals(department, faculty.department);
 	}
 
 	@Override
@@ -80,7 +84,19 @@ public class Faculty extends Person implements Serializable
 
 	// Display function
 
+	@Override
+	public String toString() {
+		String paddedName = String.format("%-20s", name);
+		String paddedEmpCode = String.format("%-8s", empCode);
+		String paddedDep = String.format("%-11s", department);
+		return "Code: " + paddedEmpCode + paddedName + paddedDep;
+	}
+
 	public String display() {
-		return super.display()+"\n5. Emp Code: "+ empCode +"\n6. Department : "+department+"\n7. Experience : "+experience+"\n8. Salary : "+salary;
+		return super.display()
+				+"\n5. EmpCode    : " + empCode
+				+"\n6. Department : " + department
+				+"\n7. Experience : "+experience
+				+"\n8. Salary     : "+salary;
 	}
 }

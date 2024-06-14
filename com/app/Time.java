@@ -1,7 +1,8 @@
 package app;
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Time
+public class Time implements Serializable, Comparable<Time>
 {
     final public Date date;
     public int start;
@@ -17,7 +18,7 @@ public class Time
     }
 
     public String toString() {
-        return date + "\t" + start + "Hrs";
+        return date + " " + String.format("%-3s", start + "H");
     }
 
     public void addTime(){
@@ -37,5 +38,13 @@ public class Time
     @Override
     public int hashCode() {
         return Objects.hash(date, start);
+    }
+
+    public int compareTo(Time other) {
+        int i = this.date.compareTo(other.date);
+        if (i == 0){
+            return Integer.compareUnsigned(start, other.start);
+        }
+        return i;
     }
 }

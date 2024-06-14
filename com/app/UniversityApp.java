@@ -23,14 +23,10 @@
 
 package app;
 
+import app.academics.AcademicsApp;
+import app.admin.AdminApp;
 import app.faculty.FacultyApp;
 import app.student.StudentApp;
-import app.admin.*;
-
-import java.util.Arrays;
-import java.util.List;
-
-import app.academics.*;
 import db.CourseDB;
 import db.FacultyDB;
 import db.StudentDB;
@@ -50,71 +46,18 @@ public class UniversityApp implements University {
     }
 
     public static void main(String[] ar) {
-        UniversityApp.makeClear();
-        loadInitialData();
-        UniversityApp university = new UniversityApp();
-        university.display();
-        // dupData();
-
-    }
-    public static void dupData() {
-        String studentFile = "C:\\Users\\7862s\\Desktop\\java\\project\\com\\storage\\studentDB.ser";
-        String facultyFile = "C:\\Users\\7862s\\Desktop\\java\\project\\com\\storage\\facultyDB.ser";
-        String courseFile = "C:\\Users\\7862s\\Desktop\\java\\project\\com\\storage\\courseDB.ser";
-         List<String> names = Arrays.asList("Aarav", "Aarush", "Abhinav", "Aditya", "Akhil", "Aryan", 
-         "Ayush", "Dhruv", "Ishaan", "Kabir", "Mohit", "Nakul", "Naman",
-          "Parth", "Pranav", "Raghav", "Rahul", "Rohit", "Sahil", "Samarth",
-           "Shivam", "Siddharth", "Vedant", "Yash", "Yuvraj", "Aaradhya", "Aarohi",
-            "Ananya", "Anika", "Anushka", "Avni", "Diya", "Ishani", "Ishika", "Ishita",
-             "Kavya", "Kiara", "Mahi", "Mehak", "Navya", "Nisha", "Pari", "Prisha", "Riya",
-              "Saumya", "Shreya", "Siya", "Tanvi", "Tanya", "Vanya", "Vidhi", "Aarav", "Aarush",
-               "Abhinav", "Aditya", "Akhil", "Aryan", "Ayush", "Dhruv", "Ishaan", "Kabir", "Mohit",
-                "Nakul", "Naman", "Parth", "Pranav", "Raghav", "Rahul", "Rohit", "Sahil", "Samarth",
-                 "Shivam", "Siddharth", "Vedant", "Yash", "Yuvraj", "Aaradhya", "Aarohi", "Ananya",
-                  "Anika", "Anushka", "Avni", "Diya", "Ishani", "Ishika", "Ishita", 
-                  "Kavya", "Kiara", "Mahi", "Mehak", "Navya", "Nisha", "Pari", "Prisha",
-                   "Riya", "Saumya", "Shreya", "Siya", "Tanvi", "Tanya", "Vanya", "Vidhi",
-                    "Aarav", "Aarush", "Abhinav", "Aditya", "Akhil", "Aryan", "Ayush", "Dhruv",
-                     "Ishaan", "Kabir", "Mohit", "Nakul", "Naman", "Parth", "Pranav");
-         var codes = new String[]{"CSE", "ECE", "EEE", "MEC"};
-        for (int i = 1; i <= 1000; i++) {
-             String name = names.get(i % 100);
-            StudentDB.add(new Student(name, i, codes[(int) (Math.random() * 10) % 4], i % 4, 4, 0));
-        }
-        for (int i = 1; i <= 1000; i++) {
-            FacultyDB.add(new Faculty(names.get(i % 100).toUpperCase() + i, codes[(int) (Math.random() * 10) % 4], i, i % 8, i, 4));
-        }
-        // a random list of 40 courses
-         List<String> courseNames = Arrays.asList("Data Structures", "Algorithms",
-          "Operating Systems", "Computer Networks", "Database Management Systems", 
-          "Software Engineering", "Computer Organization", "Computer Architecture", 
-          "Digital Logic Design", "Computer Graphics", "Artificial Intelligence",
-             "Machine Learning", "Deep Learning", "Natural Language Processing",
-              "Computer Vision", "Robotics", "Internet of Things", "Cyber Security",
-                 "Blockchain", "Quantum Computing", "Big Data", "Cloud Computing",
-                  "Mobile Computing", "Web Development", "Game Development", "Virtual Reality",
-                 "Augmented Reality", "Mixed Reality", "Data Science", "Data Analytics",
-                  "Data Mining", "Data Warehousing", "Data Visualization", "Business Intelligence",
-                     "Information Retrieval", "Information Security", "Information Privacy",
-                      "Information Theory", "Information Systems", "Information Technology",
-                     "Information Management", "Information Science");
- 
-        for (int i = 1; i <= 40; i++) {
-            var random = (int) (Math.random() * 10) % 4;
-            CourseDB.addCourse(new Course(courseNames.get(i), codes[random] + i, i % 5, 4));
-        }
-        StudentDB.saveDatabase(studentFile);
-        FacultyDB.saveDatabase(facultyFile);
-                CourseDB.saveDatabase(courseFile);
-    }
-    
-    private static void loadInitialData() {
-        String studentFile = "C:\\Users\\7862s\\Desktop\\java\\project\\com\\storage\\studentDB.ser";
-        String facultyFile = "C:\\Users\\7862s\\Desktop\\java\\project\\com\\storage\\facultyDB.ser";
-        String courseFile = "C:\\Users\\7862s\\Desktop\\java\\project\\com\\storage\\courseDB.ser";
-        StudentDB.loadDatabase(studentFile);
-        FacultyDB.loadDatabase(facultyFile);
-        CourseDB.loadDatabase(courseFile);
+        // UniversityApp.makeClear();
+        // //  Loader.dupData();
+        // //  Loader.storeDataBases();
+        // Loader.loadDataBases();
+        // UniversityApp university = new UniversityApp();
+        // university.display();
+        // System.out.println("Saving Data...");
+        // System.out.println("Data Saved Successfully");
+        // Loader.storeDataBases();
+        // get cwd
+        String cwd = System.getProperty("user.dir");
+        System.out.println(cwd);
     }
 
     @Override
@@ -216,6 +159,7 @@ public class UniversityApp implements University {
                 System.out.println("\n\u001B[31m#ERROR://\u001B[0mNo Faculty-Courses Found... error code 004\n");
                 holdNextSlide();
             }
+            case 5 -> System.out.println("\n\u001B[31m#ERROR://\u001B[0mNo Sessions Found... error code 005\n");
             case 6 -> System.out.println("\n\t\u001B[31mERROR://\u001B[0m INVALID CHOICE error code 006\t\n");
 
             case 7 -> {

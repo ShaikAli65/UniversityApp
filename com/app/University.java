@@ -17,6 +17,7 @@ public interface University
 	}
 
 	static int getIntegerFromInput() {
+		int i = 0;
 		while (true) {
 			try {
 				int integer = Integer.parseInt(scanner.next());
@@ -25,12 +26,17 @@ public interface University
 				}
 				return integer;
 			} catch (Exception e) {
+				if(i >5){
+					return -1;
+				}
 				UniversityApp.getError(1);
+				i++;
 			}
 		}
 	}
 
 	static double getDoubleFromInput() {
+		int i = 0;
 		while (true) {
 			try {
 				double integer = Double.parseDouble(scanner.next());
@@ -39,12 +45,17 @@ public interface University
 				}
 				return integer;
 			} catch (Exception e) {
+				if(i > 5){
+					return -1;
+				}
+				i++;
 				UniversityApp.getError(1);
 			}
 		}
 	}
 
 	static long getLongFromInput() {
+		int i = 0;
 		while (true) {
 			try {
 				long integer = Long.parseLong(scanner.next());
@@ -53,6 +64,10 @@ public interface University
 				}
 				return integer;
 			} catch (Exception e) {
+				if (i > 5) {
+					return -1;
+				}
+				i++;
 				UniversityApp.getError(1);
 			}
 		}

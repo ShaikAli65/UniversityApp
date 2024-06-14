@@ -2,40 +2,44 @@ package db;
 import app.admin.Student;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.stream.Stream;
 
 public class StudentDB {
-    private static final ArrayList<Student> students = new ArrayList<>();
+    private static final HashMap<String, Student> students = new HashMap<>();
     public static boolean isEmpty() {
         return students.isEmpty();
     }
     public static void add(Student student) {
-        students.add(student);
+        students.put(student.getRollNo(), student);
     }
     public static void update(Student student) {
 
     }
     public static void remove(Student student) {
-        students.remove(student);
+        students.remove(student.getRollNo());
     }
-    public static List<Student> getStudents() {
-        return students;
+    public static Stream<Student> getStudents() {
+        return students.values().stream();
     }
-        public static void loadDatabase(String fileName) {
-        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName))) {
-            students.clear(); // Clear existing data
-            students.addAll((ArrayList<Student>) inputStream.readObject());
-        } catch (IOException | ClassNotFoundException e) {
-//            e.printStackTrace();
-        }
+    public static Stream<String> getStudentsRollNos() {
+        return students.values().stream().map(Student::getRollNo);
+    }
+    public static Student getStudent(String rollNo) {
+        return students.get(rollNo);
     }
 
-    public static void saveDatabase(String fileName) {
-        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileName))) {
+    @SuppressWarnings("unchecked")
+    public static void loadDatabase(String fileName) {
+        try (var inputStream = new ObjectInputStream(new FileInputStream(fileName))) {
+            students.clear(); // Clear existing data
+            students.putAll((HashMap<String, Student>) inputStream.readObject());
+        } catch (IOException | ClassNotFoundException ignored) {}
+    }
+    public static void saveData(String fileName) {
+        try (var outputStream = new ObjectOutputStream(new FileOutputStream(fileName))) {
             outputStream.writeObject(students);
-        } catch (IOException e) {
-//            e.printStackTrace();
-        }
+        } catch (IOException ignored) {}
+        System.out.println("Student data Saved");
     }
 }

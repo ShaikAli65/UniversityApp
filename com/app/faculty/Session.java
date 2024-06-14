@@ -8,59 +8,38 @@ import app.admin.Faculty;
 import app.admin.Student;
 import db.AttendanceDB;
 import db.CourseDB;
+import db.FacultyDB;
+import db.StudentDB;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
-public class Session implements Serializable {
+public class Session implements Serializable, Comparable<Session> {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     final private Time time;
-    final private Course course;
-    final private Faculty faculty;
-    final private HashMap<Student, Boolean> attendees;
+    private transient Faculty faculty;
+    private transient Course course;
+    private transient Map<Student, Boolean> attendees;
+
     public Session(Time time, Course course, Faculty faculty) {
         this.time = time;
         this.course = course;
         this.attendees = new HashMap<>();
         this.faculty = faculty;
     }
-
-    public Session(Time time, Course course, Faculty faculty, HashMap<Student, Boolean> attendees) {
+    public Session(Time time, Course course, Faculty faculty, Map<Student, Boolean> attendees) {
         this.time = time;
         this.course = course;
         this.faculty = faculty;
         this.attendees = attendees;
     }
-
-    public Session(Session session) {
-        this(session.time, session.course, session.faculty, session.attendees);
-    }
-
-    // Utility Functions
-
-    public boolean isOfCourse(Course course) {
-        return this.course.equals(course);
-    }
-
-    public void updateSession() {
-        var students = printSession();
-        while (true) {
-            System.out.print("\nEnter index to change attendance or zero to return : ");
-            int choice = University.getIntegerFromInput();
-            if (choice == 0) break;
-            if (choice > attendees.size()) {
-                UniversityApp.getError(6);
-                continue;
-            }
-            var student = students.get(choice);
-            AttendanceDB.update(student, course, ! attendees.get(student));
-            attendees.put(student, ! attendees.get(student));
-        }
-    }
-
-    // Getters
 
     public void takeAttendanceEntries() {
         System.out.println("Enter Attendance of respective students :");
@@ -73,42 +52,75 @@ public class Session implements Serializable {
         });
         students.close();
     }
-    public Course getCourse() {
-        return course;
-    }
-    public HashMap<Student, Boolean> getAttendees() {
-        return attendees;
-    }
-    public Faculty getFaculty() {
-        return faculty;
-    }
-    public Time getTime() {
-        return time;
-    }
-    public boolean getAttendance(Student s) {
-        return attendees.get(s);
-    }
-
-    // Printers
-
-    public HashMap<Integer,Student> printSession() {
-        System.out.println(this + "\t" + course.getCredits() + "\t" + course.getSemester());
-        HashMap<Integer,Student> studentMap = new HashMap<>();
+    public HashMap<Integer, Student> printSession() {
+        System.out.println(this + "\tCR: " + course.getCredits() + "\tSEM: " + course.getSemester() + "\n");
+        HashMap<Integer, Student> studentMap = new HashMap<>();
         int i = 1;
         for (var value : attendees.entrySet()) {
+            String paddedRollNo = String.format("%-10s", value.getKey().getRollNo());
+            String paddedName = String.format("%-20s", value.getKey().getName());
             System.out.println(
-                    i + ". ROLL NO:" + value.getKey().getRollNo()
-                    + "\tStudent : " + value.getKey().getName()
-                    + "\tAttendance: "
-                    + (value.getValue() ? "Present" : "Absent")
+                    i + ". ROLL: " + paddedRollNo
+                            + "\t" + paddedName
+                            + (value.getValue() ? "P" : "A")
             );
             studentMap.put(i, value.getKey());
             i++;
         }
         return studentMap;
     }
+    public void displaySession() {
+        System.out.println(this + "\tCR: " + course.getCredits() + "\tSEM: " + course.getSemester() + "\n");
+        StringBuilder sb = new StringBuilder();
+        int p = 0;
+        for (var value : attendees.entrySet()) {
+            String paddedRollNo = String.format("%-10s", value.getKey().getRollNo());
+            String paddedName = String.format("%-20s", value.getKey().getName());
+            sb.append("ROLL: ").append(paddedRollNo)
+                    .append("\t").append(paddedName)
+                    .append(value.getValue() ? "PRE" : "AB")
+                    .append("\n");
+            if (value.getValue()) p++;
+        }
+        sb.append("\nTOTAL  : ")
+                .append(attendees.size())
+                .append("\tPRESENT: ").append(p)
+                .append("\tABSENT : ").append(attendees.size() - p);
+        System.out.println(sb);
+    }
+    public void updateSession() {
+        var students = printSession();
+        if (students.isEmpty()) {
+            UniversityApp.getError(11);
+            return;
+        }
+        while (true) {
+            System.out.print("\nEnter index to flip attendance or zero to return : ");
+            int choice = University.getIntegerFromInput();
+            if (choice == 0) break;
+            if (choice > attendees.size()) {
+                UniversityApp.getError(6);
+                continue;
+            }
+            var student = students.get(choice);
+            AttendanceDB.update(student, course, !attendees.get(student));
+            attendees.put(student, !attendees.get(student));
+            printSession();
+        }
+    }
+    public void remove(Student student) {attendees.remove(student);}
+
+
+    public Map<Student, Boolean> getAttendees() {return attendees;}
+    public Course  getCourse() {return course;}
+    public Faculty getFaculty() {return faculty;}
+    public Time    getTime() {return time;}
+    public boolean getAttendance(Student s) {return attendees.get(s);}
+    public boolean isOfCourse(Course course) {return this.course.equals(course);}
+    public boolean withFaculty(Faculty faculty) {return this.faculty.equals(faculty);}
+
     public String toString() {
-        return "TIME: " + time.toString() + "\tCOURSE CODE: " + course.getCode()+ "\tCOURSE NAME: " + course.getName();
+        return "[" + time + "]" + "\tCOURSE : " + course.getCode() + "\t" + course.getName();
     }
     @Override
     public boolean equals(Object o) {
@@ -118,10 +130,40 @@ public class Session implements Serializable {
         return Objects.equals(time, session.time) && Objects.equals(course, session.course) && Objects.equals(faculty, session.faculty);
     }
     @Override
-    public int hashCode() {
-        return Objects.hash(time, course, faculty);
+    public int hashCode() {return Objects.hash(time, course, faculty);}
+    @Override
+    public int compareTo(Session o) {return this.time.compareTo(o.time);}
+    @Serial
+    @SuppressWarnings("unchecked")
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+        ois.defaultReadObject();
+        this.course = CourseDB.get((String) ois.readObject());
+        this.faculty = FacultyDB.getFaculty((String) ois.readObject());
+
+        try {
+            this.attendees = new HashMap<>();
+            var attendeeIds = (HashMap<String, Boolean>) ois.readObject();
+            for (var entry : attendeeIds.entrySet()) {
+                Student student = StudentDB.getStudent(entry.getKey());
+                this.attendees.put(student, entry.getValue());
+            }
+        }
+        catch (ClassNotFoundException e) {
+            this.attendees = new HashMap<>();
+        }
     }
-    public boolean withFaculty(Faculty faculty) {
-        return this.faculty.equals(faculty);
+    @Serial
+    private void writeObject(ObjectOutputStream oos) throws IOException {
+        oos.defaultWriteObject();
+        oos.writeObject(this.course.getCode());
+        oos.writeObject(this.faculty.getEmpCode());
+        var attendeeIds = this.attendees.entrySet()
+                 .stream()
+                 .collect(Collectors.toMap(
+                         entry -> entry.getKey().getRollNo(),
+                         Map.Entry::getValue
+                 ));
+        oos.writeObject(attendeeIds);
+//        System.out.println("Session data Saved"+this.time+" "+this.course.getCode()); // Debug
     }
 }

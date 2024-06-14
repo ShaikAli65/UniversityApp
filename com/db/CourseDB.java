@@ -1,9 +1,4 @@
 package db;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Stream;
 
 import app.academics.Course;
 import app.academics.FacultyCourse;
@@ -11,44 +6,67 @@ import app.academics.StudentCourse;
 import app.admin.Faculty;
 import app.admin.Student;
 
+import java.io.*;
+import java.util.HashMap;
+import java.util.stream.Stream;
+
 
 public class CourseDB {
-    final private static HashMap<Faculty, FacultyCourse> facultyCourses = new HashMap<>();
-	final private static HashMap<Student, StudentCourse> studentCourses = new HashMap<>();
+    final private static HashMap<String, FacultyCourse> facultyCourses = new HashMap<>();
+	final private static HashMap<String, StudentCourse> studentCourses = new HashMap<>();
     final private static HashMap<String, Course> courses = new HashMap<>();
     public static void addCourse(Course course) {
         courses.put(course.getCode(),course);
     }
     public static void updateCourse(Student student, StudentCourse course) {
-        studentCourses.put(student, course);
+        studentCourses.put(student.getRollNo(), course);
     }
     public static void updateCourse(Faculty faculty, FacultyCourse course) {
-        facultyCourses.put(faculty, course);
+        facultyCourses.put(faculty.getEmpCode(), course);
     }
     public static void removeCourse(Course course) {
         courses.remove(course.getCode());
     }
     public static StudentCourse getCourses(Student student) {
-        return studentCourses.get(student);
+        return studentCourses.get(student.getRollNo());
     }
     public static FacultyCourse getCourses(Faculty faculty) {
-        return facultyCourses.get(faculty);
+        return facultyCourses.get(faculty.getEmpCode());
+    }
+    public static Stream<Course>  getCourses (int semester) {
+        return courses.values().stream().parallel().filter(course -> course.getSemester() == semester);
     }
     public static Stream<Student> getStudentsWithCourse(Course course) {
-        return StudentDB.getStudents().stream()
-        .filter(studentCourses::containsKey)
-        .filter(student -> CourseDB.getCourses(student).contains(course));
+        return StudentDB.getStudents().filter(
+                student -> studentCourses.containsKey(student.getRollNo())
+                        && studentCourses.get(student.getRollNo()).contains(course)
+        );
+    }
+    public static Stream<Student> getStudentsWithCourse(String courseCode) {
+        return StudentDB.getStudents().filter(
+                student -> studentCourses.containsKey(student.getRollNo())
+                        && studentCourses.get(student.getRollNo()).contains(courses.get(courseCode))
+        );
     }
     public static Stream<Faculty> getFacultiesForCourse(Course course) {
-        return FacultyDB.getFaculties().stream()
-                .filter(facultyCourses::containsKey)
-                .filter(faculty -> CourseDB.getCourses(faculty).contains(course));
+        return FacultyDB.getFaculties().filter(
+                faculty -> facultyCourses.containsKey(faculty.getEmpCode())
+                        && facultyCourses.get(faculty.getEmpCode()).contains(course)
+        );
     }
-    public static List<Course> getCoursesForSemester(int semester) {
-        return courses.values().stream().parallel().filter(course -> course.getSemester() == semester).toList();
+    public static Stream<Faculty> getFacultiesForCourse(String courseId) {
+        var course = courses.get(courseId);
+        return FacultyDB.getFaculties().filter(
+                faculty -> facultyCourses.containsKey(faculty.getEmpCode())
+                        && facultyCourses.get(faculty.getEmpCode()).contains(course)
+        );
     }
-    public static List<Course> getCourses() {
-        return courses.values().stream().toList();
+
+    public static Stream<Course> getCourses() {
+        return courses.values().stream();
+    }
+    public static Course get(String code) {
+        return courses.get(code);
     }
     public static boolean isEmpty() {
         return courses.isEmpty();
@@ -56,22 +74,51 @@ public class CourseDB {
     public static int noOfCourses() {
         return courses.size();
     }
-            public static void loadDatabase(String fileName) {
-        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName))) {
-            courses.clear(); // Clear existing data
-            List<Course> courses = (List<Course>) inputStream.readObject();
-            courses.forEach(CourseDB::addCourse);
-        } catch (IOException | ClassNotFoundException e) {
-//            e.printStackTrace();
-        }
+
+    @SuppressWarnings("unchecked")
+    public static void loadDatabase(String[] fileName) {
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName[0]))) {
+            courses.clear();
+            var _courses = (HashMap<String, Course>) inputStream.readObject();
+            courses.putAll(_courses);
+        } catch (IOException | ClassNotFoundException ignore) {}
+
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName[1]))) {
+            studentCourses.clear();
+            var _studentCourses = (HashMap<String, StudentCourse>) inputStream.readObject();
+            studentCourses.putAll(_studentCourses);
+        } catch (IOException | ClassNotFoundException ignored) {}
+
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName[2]))) {
+            facultyCourses.clear();
+            var _courses = (HashMap<String, FacultyCourse>) inputStream.readObject();
+            facultyCourses.putAll(_courses);
+        } catch (IOException | ClassNotFoundException ignored) {}
     }
 
-    public static void saveDatabase(String fileName) {
-        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileName))) {
-            List<Course> _courses = new ArrayList<>(courses.values());
-            outputStream.writeObject(_courses);
+    public static void saveData(String[] fileNames) {
+        System.out.println("Saving Course Data");
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileNames[0]))) {
+            outputStream.writeObject(courses);
         } catch (IOException e) {
-//            e.printStackTrace();
+            System.out.println("Error in saving Course Data" + e);
         }
+        System.out.println("Saving Student Course Data");
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileNames[1]))) {
+            outputStream.writeObject(studentCourses);
+        } catch (IOException e) {
+            System.out.println("Error in saving Student Course Data" + e);
+        }
+        System.out.println("Saving Faculty Course Data");
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileNames[2]))) {
+            outputStream.writeObject(facultyCourses);
+        } catch (IOException e) {
+            System.out.println("Error in saving Faculty Course Data" + e);
+        }
+        System.out.println(
+                """
+                        Course Data Saved
+                        Student Course Data Saved
+                        Faculty Course Data Saved""");
     }
 }

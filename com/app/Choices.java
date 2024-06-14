@@ -9,7 +9,6 @@ import app.admin.Student;
 import app.faculty.Session;
 import db.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 

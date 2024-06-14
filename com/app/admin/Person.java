@@ -1,9 +1,12 @@
 package app.admin;
+
+import app.University;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.StringTokenizer;
 
-import app.*;
+
 class Person implements University, Serializable
 {
 	protected String name;
@@ -26,11 +29,17 @@ class Person implements University, Serializable
 
 	Person (String name)
 	{
-		new Person(name, "1-1-2000", "", 0);
+		this.name = name;
+		this.dob = new DOB("1-1-2000");
+		this.emailId = "";
+		this.mobile = 0;
 	}
 
 	public String display() {
-		return "1. Name : "+name+"\n2. DOB : "+dob+"\n3. Email ID : "+ emailId +"\n4. Mobile : "+mobile;
+		return     "1. Name       : " + name
+				+"\n2. DOB        : " + dob
+				+"\n3. Email      : "+ emailId
+				+"\n4. Mobile     : "+mobile;
 	}
 
 	@Override
@@ -43,7 +52,7 @@ class Person implements University, Serializable
 		this.dob= new DOB(d);
 	}
 
-	static class DOB {
+	static class DOB implements Serializable{
 		final private int day;
 		final private int month;
 		final private int year;
@@ -94,6 +103,22 @@ class Person implements University, Serializable
 	public long getMobile()
 	{
 		return this.mobile;
+	}
+
+	public void setDob(DOB dob) {
+		this.dob = dob;
+	}
+
+	public void setEmailId(String emailId) {
+		this.emailId = emailId;
+	}
+
+	public void setMobile(long mobile) {
+		this.mobile = mobile;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	@Override

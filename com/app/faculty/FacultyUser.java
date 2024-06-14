@@ -1,9 +1,9 @@
 package app.faculty;
 
+import app.Choices;
 import app.Time;
 import app.University;
 import app.UniversityApp;
-import app.academics.Exam;
 import app.admin.Faculty;
 import db.AttendanceDB;
 import db.CourseDB;
@@ -19,9 +19,9 @@ public class FacultyUser implements University, Serializable
     final private char[] passwordArray;
     final private Faculty faculty;
 
-    public FacultyUser(Faculty faculty) {
-        passwordArray = University.getPasswordFromInput();
+    public FacultyUser(Faculty faculty, char[] passwordArray) {
         this.faculty = faculty;
+        this.passwordArray = passwordArray;
     }
 
     @Override
@@ -39,97 +39,66 @@ public class FacultyUser implements University, Serializable
     // Utility Functions
 
     public void addSession() {
-        var courses_cache = CourseDB.getCourses(this.faculty);
+        var coursesCache = CourseDB.getCourses(this.faculty);
         printHeader("Adding Session");
         Time time = new Time();
         time.addTime();
-        Session session = new Session(time, courses_cache.getCourseChoice(), this.faculty);
+        Session session = new Session(time, Choices.getCourse(coursesCache, "Adding Session"), this.faculty);
         printHeader("Adding Session > Entering Attendance");
         session.takeAttendanceEntries();
         SessionDB.add(session);
     }
 
     public void displaySessions() {
-        printHeader("Displaying Sessions");
-        var session = getSessionChoice();
+        var session = Choices.getSession(this.faculty, "Displaying Sessions");
         if (session == null) {
+            UniversityApp.holdNextSlide();
             return;
         }
-        session.printSession();
+        printHeader("Displaying Sessions");
+        session.displaySession();
+        UniversityApp.holdNextSlide();
     }
 
     void updateSession() {
-        printHeader("Updating Session");
-        var session = getSessionChoice();
-        if (session == null) {return;}
-        printHeader("Updating Session >" + session);
+        var session = Choices.getSession(this.faculty, "Updating Session");
+        if (session == null) {
+            UniversityApp.holdNextSlide();
+            return;
+        }
+        printHeader("Updating Session >" + session.getTime() + " " + session.getCourse().getCode());
         session.updateSession();
         SessionDB.update(session);
     }
 
     public void deleteSession() {
-        printHeader("Deleting Session");
-        var session = getSessionChoice();
+        var session = Choices.getSession(this.faculty, "Deleting Session");
         if (session == null) {
+            UniversityApp.holdNextSlide();
             return;
         }
+        printHeader("Deleting Session");
         for (var entry : session.getAttendees().entrySet()) {
-//            Student student = entry.getKey();
-//            Boolean attendance = entry.getValue();
             AttendanceDB.delete(entry.getKey(), session.getCourse(), entry.getValue());
         }
         SessionDB.remove(session);
     }
 
-    public Session getSessionChoice() {
-        var session_cache = SessionDB.getSessions(this.faculty);
-        if (session_cache.isEmpty()) {UniversityApp.getError(19);return null;}
-
-        System.out.println("These are the sessions you have: ");
-        int i = 1;
-        for (Session session : session_cache) {
-            System.out.println(i + ". " + session.getTime());
-            i++;
-        }
-
-        System.out.print("\nEnter the session number you want to select or zero to return: ");
-        int choice = University.getIntegerFromInput() - 1;
-        if(choice == -1) {return null;}
-        try {
-            return session_cache.get(choice);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     public void enterExamData() {
         printHeader("Entering Exam Data");
-        var courses_cache = CourseDB.getCourses(this.faculty);
-        var course = courses_cache.getCourseChoice();
+        var coursesCache = CourseDB.getCourses(this.faculty);
+        var course = Choices.getCourse(coursesCache, "Entering Exam Data");
         if (course == null) {
             return;
         }
-        var exams = ExamDB.getExams(course);
-        if (exams.isEmpty()) {
-            UniversityApp.getError(17);
+        var exam = Choices.getExam(course, "Entering Exam Data");
+        if (exam == null) {
             return;
         }
-
-        printHeader("Entering Exam Data > Entering Marks");
-        System.out.println("Here are the exams for the course: " + course.getName());
-        int i = 1;
-        for (Exam exam : exams) {
-            System.out.println(i + ". " + exam.getExamDate());
-            i++;
-        }
-
-        System.out.print("\nEnter the exam number you want to select or zero to exit: ");
-        int choice = University.getIntegerFromInput() - 1;
-        if (choice == -1) return;
         printHeader("Entering Exam Data > Entering Marks");
         try {
-            var exam = exams.get(choice);
             exam.getMarksEntriesFromInput();
+            exam.markEvaluated();
             ExamDB.update(exam);
         } catch (Exception e) {
             UniversityApp.getError(17);
@@ -137,17 +106,18 @@ public class FacultyUser implements University, Serializable
     }
 
     public void displayExams() {
-        printHeader("Displaying Exams");
-        var exam = getExamChoice();
+        var exam = Choices.getExam(this.faculty, "Displaying Exams");
         if (exam == null) {
+            UniversityApp.holdNextSlide();
             return;
         }
+        printHeader("Displaying Exams");
         exam.printExam();
+        UniversityApp.holdNextSlide();
     }
 
     void updateExam() {
-        printHeader("Updating Exam");
-        var exam = getExamChoice();
+        var exam = Choices.getExam(this.faculty, "Updating Exam");
         if (exam == null) {return;}
         printHeader("Updating Exam >" + exam);
         exam.updateExam();
@@ -155,33 +125,12 @@ public class FacultyUser implements University, Serializable
     }
 
     public void deleteExam() {
-        printHeader("Deleting Exam");
-        var exam = getExamChoice();
+        var exam = Choices.getExam(this.faculty, "Deleting Exam");
         if (exam == null) {
+            UniversityApp.holdNextSlide();
             return;
         }
         ExamDB.remove(exam);
-    }
-
-    public Exam getExamChoice() {
-        var exams_cache = ExamDB.getExams(this.faculty);
-        if (exams_cache.isEmpty()) {
-            UniversityApp.getError(17);
-            return null;
-        }
-        System.out.println("These are the exams conducted:");
-        int i = 1;
-        for (Exam exam : exams_cache) {
-            System.out.println(i + ". " + exam.getExamDate());
-            i++;
-        }
-        System.out.println("Enter the exam number you want to select:");
-        int choice = University.getIntegerFromInput() - 1;
-        try {
-            return exams_cache.get(choice);
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     @Override

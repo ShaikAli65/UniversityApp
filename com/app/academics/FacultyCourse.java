@@ -1,27 +1,28 @@
 package app.academics;
 
-import app.University;
-import app.UniversityApp;
 import app.admin.Faculty;
+import db.CourseDB;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.HashSet;
+import java.util.List;
 
 public class FacultyCourse implements Serializable
 {
-	// Structure to store
-	final HashSet<Course> courses;
+	@Serial
+	private static final long serialVersionUID = 1L;
+    private transient HashSet<Course> courses;
 
 	private int count;
-	private final int no_courses;
+	private final int noCourses;
 
 	public FacultyCourse(Faculty f) {
-		no_courses = f.getNoCourses();
-		courses = new HashSet<>(no_courses);
+		noCourses = f.getNoCourses();
+		courses = new HashSet<>(noCourses);
 		count = 0;
 	}
 	public FacultyCourse(Faculty f, HashSet<Course> c) {
-		no_courses = f.getNoCourses();
+		noCourses = f.getNoCourses();
 		courses = c;
 		count = c.size();
 	}
@@ -29,10 +30,10 @@ public class FacultyCourse implements Serializable
 	// Utility Functions
 
 	public void add(Course c) {
-		if(no_courses == 0) {
+		if(noCourses == 0) {
 			System.out.println("Choose number of subjects to register in this semester\n");
 		}
-		if( count <= no_courses)
+		if( count <= noCourses)
 		{
 			if (courses.contains(c)) {
 				System.out.println("Course already registered\n");
@@ -60,26 +61,17 @@ public class FacultyCourse implements Serializable
 
 	// Getters
 
-	public Course getCourseChoice() {
-		System.out.println("Courses taught by You : \n");
-		int i = 1;
-		for(Course c: courses) {
-			System.out.println(i + ". " + c.toString());
-			i++;
-		}
-		System.out.print("\nEnter the course index to select : ");
-		int ch = University.getIntegerFromInput();
-		if(ch > courses.size() || ch < 1)
-		{
-			UniversityApp.getError(6);
-			return null;
-		}
-		return (Course) courses.toArray()[ch-1];
-	}
-
 	public boolean hasCourse(Course course) {
 		return courses.contains(course);
 	}
+	public List<Course> getCourses() {
+		return courses.stream().toList();
+	}
+
+	public int getNoCourses() {
+		return noCourses;
+	}
+
 	// Display Functions
 	@Override
 	public String toString() {
@@ -91,4 +83,26 @@ public class FacultyCourse implements Serializable
         }
 		return ret.toString();
 	}
+    @Serial
+	private void writeObject(ObjectOutputStream oos) throws IOException {
+        oos.defaultWriteObject();
+		assert courses != null;
+        oos.writeInt(courses.size());
+        for (Course course : courses) {
+			assert course != null;
+            oos.writeObject(course.getCode());
+        }
+    }
+
+    @Serial
+	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+        ois.defaultReadObject();
+        int size = ois.readInt();
+        this.courses = new HashSet<>(size);
+        for (int i = 0; i < size; i++) {
+            String courseCode = (String) ois.readObject();
+            Course course = CourseDB.get(courseCode);
+            courses.add(course);
+        }
+    }
 }
