@@ -13,20 +13,23 @@ import java.util.stream.Stream;
 
 public class SessionDB {
     final private static List<Session> sessions = new ArrayList<>();
-
-    public static void add(Session session) {sessions.add(session);}
+    private static Boolean changed = false;
+    public static void add(Session session) {changed=true;sessions.add(session);}
     public static void update(Session session) {
-
+        changed=true;
     }
-    public static void remove(Session session) {sessions.remove(session);}
+    public static void remove(Session session) {changed=true;sessions.remove(session);}
     public static void remove(Course course) {
+        changed=true;
         sessions.stream().parallel().forEach(session -> {
             if (session.isOfCourse(course)) {
                 sessions.remove(session);
             }
         });
     }
-    public static void remove(Student student) {sessions.stream().parallel().forEach(session -> session.remove(student));}
+    public static void remove(Student student) {
+        changed=true;
+        sessions.stream().parallel().forEach(session -> session.remove(student));}
     public static Stream<Session> getSessions() {return sessions.stream();}
     public static Stream<Session> getSessions(Faculty faculty) {
         return sessions
@@ -53,6 +56,12 @@ public class SessionDB {
         System.out.println("Session data Loaded");
     }
     public static void saveData(String sessionFile) {
+        if (!changed) return;
+        try {
+                FileWriter writer = new FileWriter(sessionFile);
+                writer.write("");
+                writer.close();
+            } catch (IOException ignore) {}
         try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(sessionFile))) {
             outputStream.writeObject(sessions);
         } catch (IOException ignore) {}

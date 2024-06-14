@@ -29,6 +29,7 @@ import app.faculty.FacultyApp;
 import app.student.StudentApp;
 import db.CourseDB;
 import db.FacultyDB;
+import db.Loader;
 import db.StudentDB;
 
 
@@ -46,18 +47,15 @@ public class UniversityApp implements University {
     }
 
     public static void main(String[] ar) {
-        // UniversityApp.makeClear();
-        // //  Loader.dupData();
-        // //  Loader.storeDataBases();
-        // Loader.loadDataBases();
-        // UniversityApp university = new UniversityApp();
-        // university.display();
-        // System.out.println("Saving Data...");
-        // System.out.println("Data Saved Successfully");
-        // Loader.storeDataBases();
-        // get cwd
-        String cwd = System.getProperty("user.dir");
-        System.out.println(cwd);
+//           Loader.dupData();
+//           Loader.storeDataBases();
+         UniversityApp.makeClear();
+         Loader.loadDataBases();
+         UniversityApp university = new UniversityApp();
+         university.display();
+         System.out.println("Saving Data...");
+         System.out.println("Data Saved Successfully");
+         Loader.storeDataBases();
     }
 
     @Override

@@ -7,16 +7,20 @@ import java.util.stream.Stream;
 
 public class StudentDB {
     private static final HashMap<String, Student> students = new HashMap<>();
+    private static Boolean changed = false;
     public static boolean isEmpty() {
         return students.isEmpty();
     }
     public static void add(Student student) {
+        changed = true;
         students.put(student.getRollNo(), student);
     }
     public static void update(Student student) {
-
+        changed = true;
+//        students.put(student.getRollNo(), student);
     }
     public static void remove(Student student) {
+        changed = true;
         students.remove(student.getRollNo());
     }
     public static Stream<Student> getStudents() {
@@ -37,6 +41,12 @@ public class StudentDB {
         } catch (IOException | ClassNotFoundException ignored) {}
     }
     public static void saveData(String fileName) {
+        if (!changed) return;
+        try {
+                FileWriter writer = new FileWriter(fileName);
+                writer.write("");
+                writer.close();
+            } catch (IOException ignore) {}
         try (var outputStream = new ObjectOutputStream(new FileOutputStream(fileName))) {
             outputStream.writeObject(students);
         } catch (IOException ignored) {}

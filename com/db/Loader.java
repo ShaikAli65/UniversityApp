@@ -10,41 +10,48 @@ import app.admin.Faculty;
 import app.admin.Student;
 import app.faculty.Session;
 
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.nio.file.Paths;
 
 
 public class Loader {
     private static final String SOURCE_PATH         = Paths.get(System.getProperty("user.dir"),"com", "storage").toString();
-    private static final String STUDENT_FILE        = Paths.get(SOURCE_PATH, "studentDB.ser").toString();
-    private static final String FACULTY_FILE        = Paths.get(SOURCE_PATH, "facultyDB.ser").toString();
-    private static final String COURSE_FILE         = Paths.get(SOURCE_PATH, "courseDB.ser").toString();
-    private static final String STUDENT_COURSE_FILE = Paths.get(SOURCE_PATH, "studentCourseDB.ser").toString();
-    private static final String FACULTY_COURSE_FILE = Paths.get(SOURCE_PATH, "facultyCourseDB.ser").toString();
-    private static final String STUDENT_USER_FILE   = Paths.get(SOURCE_PATH, "studentUserDB.ser").toString();
-    private static final String FACULTY_USER_FILE   = Paths.get(SOURCE_PATH, "facultyUserDB.ser").toString();
-    private static final String EXAM_FILE           = Paths.get(SOURCE_PATH, "examDB.ser").toString();
-    private static final String SESSION_FILE        = Paths.get(SOURCE_PATH, "sessionDB.ser").toString();
-    private static final String ATTENDANCE_FILE     = Paths.get(SOURCE_PATH, "attendanceDB.ser").toString();
-
+    private static final String[] FILE_PATHS = new String[]{
+            "studentDB.ser", "facultyDB.ser", "courseDB.ser", "studentCourseDB.ser", "facultyCourseDB.ser",
+            "studentUserDB.ser", "facultyUserDB.ser", "examDB.ser", "sessionDB.ser", "attendanceDB.ser"
+    };
     public static void loadDataBases() {
-        StudentDB.loadDatabase(STUDENT_FILE);
-        FacultyDB.loadDatabase(FACULTY_FILE);
-        CourseDB.loadDatabase(new String[]{COURSE_FILE, STUDENT_COURSE_FILE, FACULTY_COURSE_FILE});
-        UserHandlesDB.loadDatabase(new String[]{STUDENT_USER_FILE, FACULTY_USER_FILE});
-        ExamDB.loadDatabase(EXAM_FILE);
-        SessionDB.loadDatabase(SESSION_FILE);
-        AttendanceDB.loadDatabase(ATTENDANCE_FILE);
+        StudentDB.loadDatabase(Paths.get(SOURCE_PATH, FILE_PATHS[0]).toString());
+        FacultyDB.loadDatabase(Paths.get(SOURCE_PATH, FILE_PATHS[1]).toString());
+        CourseDB.loadDatabase(new String[]{
+                Paths.get(SOURCE_PATH, FILE_PATHS[2]).toString(),
+                Paths.get(SOURCE_PATH, FILE_PATHS[3]).toString(),
+                Paths.get(SOURCE_PATH, FILE_PATHS[4]).toString()}
+        );
+        UserHandlesDB.loadDatabase(new String[]{
+                Paths.get(SOURCE_PATH, FILE_PATHS[5]).toString(),
+                Paths.get(SOURCE_PATH, FILE_PATHS[6]).toString()}
+        );
+        ExamDB.loadDatabase(Paths.get(SOURCE_PATH, FILE_PATHS[7]).toString());
+        SessionDB.loadDatabase(Paths.get(SOURCE_PATH, FILE_PATHS[8]).toString());
+        AttendanceDB.loadDatabase(Paths.get(SOURCE_PATH, FILE_PATHS[9]).toString());
     }
     public static void storeDataBases() {
-        StudentDB.saveData(STUDENT_FILE);
-        FacultyDB.saveData(FACULTY_FILE);
-        CourseDB.saveData(new String[]{COURSE_FILE, STUDENT_COURSE_FILE, FACULTY_COURSE_FILE});
-        UserHandlesDB.saveData(new String[]{STUDENT_USER_FILE, FACULTY_USER_FILE});
-        ExamDB.saveData(EXAM_FILE);
-        SessionDB.saveData(SESSION_FILE);
-        AttendanceDB.saveData(ATTENDANCE_FILE);
+        StudentDB.saveData(Paths.get(SOURCE_PATH, FILE_PATHS[0]).toString());
+        FacultyDB.saveData(Paths.get(SOURCE_PATH, FILE_PATHS[1]).toString());
+        CourseDB.saveData(new String[]{
+                Paths.get(SOURCE_PATH, FILE_PATHS[2]).toString(),
+                Paths.get(SOURCE_PATH, FILE_PATHS[3]).toString(),
+                Paths.get(SOURCE_PATH, FILE_PATHS[4]).toString()}
+        );
+        UserHandlesDB.saveData(new String[]{
+                Paths.get(SOURCE_PATH, FILE_PATHS[5]).toString(),
+                Paths.get(SOURCE_PATH, FILE_PATHS[6]).toString()
+        });
+        ExamDB.saveData(Paths.get(SOURCE_PATH, FILE_PATHS[7]).toString());
+        SessionDB.saveData(Paths.get(SOURCE_PATH, FILE_PATHS[8]).toString());
+        AttendanceDB.saveData(Paths.get(SOURCE_PATH, FILE_PATHS[9]).toString());
     }
     public static void dupData() {
         System.out.println("Duplicating Data...");

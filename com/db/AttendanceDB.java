@@ -9,24 +9,32 @@ import java.util.HashMap;
 public class AttendanceDB {
     // String = StudentId (roll no)
     static HashMap<String, entry> entries = new HashMap<>();
-
+    static Boolean changed = false;
     public static void add(Student st, Course course, boolean attendance) {
+        changed = true;
         entry _entry = entries.computeIfAbsent(st.getRollNo(), k ->new entry(course));
         _entry.add(course, attendance);
     }
     public static String getEntry(Student s) {
+
+        if (!entries.containsKey(s.getRollNo())) return "No Attendance Data Found";
         return entries.get(s.getRollNo()).toString();
     }
     public static void update(Student st, Course course, boolean what) {
+        changed = true;
         var entry = entries.computeIfAbsent(st.getRollNo(), k -> new entry(course));
         entry.update(course, what);
     }
     public static void delete(Student st, Course c, boolean what) {
+        changed = true;
         var entry = entries.computeIfAbsent(st.getRollNo(), k -> new entry(c));
         entry.delete(c, what);
     }
-    public static void remove(Student st) {entries.remove(st.getRollNo());}
-    public static void delete(Course c) {entries.values().forEach(entry -> entry.remove(c));}
+    public static void remove(Student st) {
+        changed = true;
+        entries.remove(st.getRollNo());
+    }
+    public static void delete(Course c) {changed = true;entries.values().forEach(entry -> entry.remove(c));}
     @SuppressWarnings("unchecked")
     public static void loadDatabase(String attendanceFile) {
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(attendanceFile))) {
@@ -34,6 +42,13 @@ public class AttendanceDB {
         } catch (IOException | ClassNotFoundException ignored) {}
     }
     public static void saveData(String attendanceFile) {
+        if (!changed) return;
+        try {
+                FileWriter writer = new FileWriter(attendanceFile);
+                writer.write("");
+                writer.close();
+            } catch (IOException ignore) {}
+
         try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(attendanceFile))) {
             outputStream.writeObject(entries);
         } catch (IOException ignored) {}
@@ -53,7 +68,7 @@ class entry implements Serializable {
         @Override
         public String toString() {
             var percentage = conducted == 0 ? 0 : (attended * 100) / conducted;
-            var stringPadded = String.format("%8s", attended + '/' + conducted);
+            var stringPadded = String.format("%8s", String.valueOf(attended) + '/' + conducted);
             return stringPadded + "(" + percentage +"%)";
         }
     }

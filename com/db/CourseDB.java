@@ -7,6 +7,8 @@ import app.admin.Faculty;
 import app.admin.Student;
 
 import java.io.*;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
@@ -15,16 +17,21 @@ public class CourseDB {
     final private static HashMap<String, FacultyCourse> facultyCourses = new HashMap<>();
 	final private static HashMap<String, StudentCourse> studentCourses = new HashMap<>();
     final private static HashMap<String, Course> courses = new HashMap<>();
+    private static Boolean changed = false;
     public static void addCourse(Course course) {
+        changed = true;
         courses.put(course.getCode(),course);
     }
     public static void updateCourse(Student student, StudentCourse course) {
+        changed = true;
         studentCourses.put(student.getRollNo(), course);
     }
     public static void updateCourse(Faculty faculty, FacultyCourse course) {
+        changed = true;
         facultyCourses.put(faculty.getEmpCode(), course);
     }
     public static void removeCourse(Course course) {
+        changed = true;
         courses.remove(course.getCode());
     }
     public static StudentCourse getCourses(Student student) {
@@ -97,6 +104,15 @@ public class CourseDB {
     }
 
     public static void saveData(String[] fileNames) {
+        if (!changed) return;
+        Arrays.asList(fileNames).forEach(fileName ->{
+            try {
+                FileWriter writer = new FileWriter(Paths.get(fileName).toString());
+                writer.write("");
+                writer.close();
+            } catch (IOException ignore) {}
+        });
+
         System.out.println("Saving Course Data");
         try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileNames[0]))) {
             outputStream.writeObject(courses);

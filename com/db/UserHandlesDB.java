@@ -12,17 +12,21 @@ import java.util.HashMap;
 public class UserHandlesDB {
     final private static HashMap<String, char[]> studentUserHashMap = new HashMap<>();
     final private static HashMap<String, char[]> facultyUserHashMap = new HashMap<>();
-
+    private static Boolean changed = false;
     public static void add(Student student, char[] passwordArray) {
+        changed = true;
         studentUserHashMap.put(student.getRollNo(), passwordArray);
     }
     public static void add(Faculty faculty, char[] passwordArray) {
+        changed = true;
         facultyUserHashMap.put(faculty.getEmpCode(), passwordArray);
     }
     public static void remove(Student student) {
+        changed = true;
         studentUserHashMap.remove(student.getRollNo());
     }
     public static void remove(Faculty faculty){
+        changed = true;
         facultyUserHashMap.remove(faculty.getEmpCode());
     }
 
@@ -54,6 +58,15 @@ public class UserHandlesDB {
 
     }
     public static void saveData(String[] fileNames) {
+        if (!changed) return;
+        try {
+                FileWriter writer = new FileWriter(fileNames[0]);
+                writer.write("");
+                writer.close();
+                writer = new FileWriter(fileNames[1]);
+                writer.write("");
+                writer.close();
+            } catch (IOException ignore) {}
         try (var outputStream = new ObjectOutputStream(new FileOutputStream(fileNames[0]))) {
             outputStream.writeObject(studentUserHashMap);
         } catch (IOException ignored) {}

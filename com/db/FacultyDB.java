@@ -9,16 +9,20 @@ import java.util.stream.Stream;
 
 public class FacultyDB {
     private static final HashMap<String, Faculty> faculties = new HashMap<>();
+    private static Boolean changed = false;
     public static boolean isEmpty() {
         return faculties.isEmpty();
     }
     public static void add(Faculty faculty) {
+        changed = true;
         faculties.put(faculty.getEmpCode(), faculty);
     }
     public static void update(Faculty faculty) {
+        changed = true;
         faculties.put(faculty.getEmpCode(), faculty);
     }
     public static void remove(Faculty faculty) {
+        changed = true;
         faculties.remove(faculty.getEmpCode());
     }
     public static Stream<Faculty> getFaculties() {
@@ -37,6 +41,12 @@ public class FacultyDB {
     }
 
     public static void saveData(String fileName) {
+        if (!changed) return;
+        try {
+                FileWriter writer = new FileWriter(fileName);
+                writer.write("");
+                writer.close();
+            } catch (IOException ignore) {}
         try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(fileName))) {
             outputStream.writeObject(faculties);
         } catch (IOException ignored) {}

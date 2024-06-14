@@ -13,17 +13,21 @@ import java.util.stream.Stream;
 
 public class ExamDB {
     final private static List<Exam> exams = new ArrayList<>();
-
+    private static Boolean changed = false;
     public static void add(Exam exam) {
+        changed = true;
         exams.add(exam);
     }
     public static void update(Exam exam) {
-
+        changed = true;
+//        exams.set(exams.indexOf(exam), exam);
     }
     public static void remove(Exam exam) {
+        changed = true;
         exams.remove(exam);
     }
     public static void remove(Student student) {
+        changed = true;
         exams.stream().parallel().forEach(exam -> exam.remove(student));
     }
     public static List<Exam> getExams() {
@@ -57,6 +61,12 @@ public class ExamDB {
         } catch (IOException | ClassNotFoundException ignored) {}
     }
     public static void saveData(String examFile) {
+        if (!changed) return;
+        try {
+                FileWriter writer = new FileWriter(examFile);
+                writer.write("");
+                writer.close();
+            } catch (IOException ignore) {}
         try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(examFile))) {
             outputStream.writeObject(exams);
         } catch (IOException ignore) {}
