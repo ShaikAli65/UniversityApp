@@ -15,8 +15,8 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 public class Session implements Serializable, Comparable<Session> {
@@ -43,14 +43,18 @@ public class Session implements Serializable, Comparable<Session> {
 
     public void takeAttendanceEntries() {
         System.out.println("Enter Attendance of respective students :");
-        Stream<Student> students = CourseDB.getStudentsWithCourse(course);
+        var students = CourseDB.getStudentsWithCourse(course);
+        AtomicInteger present = new AtomicInteger();
         students.forEach(student -> {
             System.out.print("ROLL NO : " + student.getRollNo() + "\tAttendance (1/0):");
             var attendance = University.getIntegerFromInput() != 0;
             attendees.put(student, attendance);
+            present.addAndGet(attendance ? 1 : 0);
             AttendanceDB.add(student, course, attendance);
         });
         students.close();
+        System.out.println("STATS : " + present + " PRESENT\t" + (attendees.size() - present.get()) + " ABSENT");
+
     }
     public HashMap<Integer, Student> printSession() {
         System.out.println(this + "\tCR: " + course.getCredits() + "\tSEM: " + course.getSemester() + "\n");

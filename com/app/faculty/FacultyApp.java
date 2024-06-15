@@ -22,7 +22,7 @@ public class FacultyApp implements University {
 
         Faculty faculty = Choices.getFaculty("FacultyApp > Logging");
         if (faculty == null) {return null;}
-
+        printHeader("logging > " + faculty.getName());
         var facultyUser = getFacultyHandle(faculty);
         if (facultyUser == null) {UniversityApp.getError(15);return null;}
 

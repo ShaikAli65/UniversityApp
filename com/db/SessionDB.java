@@ -53,7 +53,7 @@ public class SessionDB {
             var _sessions = (List<Session>) inputStream.readObject();
             sessions.addAll(_sessions);
         } catch (IOException | ClassNotFoundException ignored) {}
-        System.out.println("Session data Loaded");
+        // System.out.println("Session data Loaded");
     }
     public static void saveData(String sessionFile) {
         if (!changed) return;

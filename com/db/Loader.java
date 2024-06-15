@@ -10,17 +10,15 @@ import app.admin.Faculty;
 import app.admin.Student;
 import app.faculty.Session;
 
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
 
 public class Loader {
-    private static final String SOURCE_PATH         = Paths.get(System.getProperty("user.dir"),"com", "storage").toString();
-    private static final String[] FILE_PATHS = new String[]{
-            "studentDB.ser", "facultyDB.ser", "courseDB.ser", "studentCourseDB.ser", "facultyCourseDB.ser",
-            "studentUserDB.ser", "facultyUserDB.ser", "examDB.ser", "sessionDB.ser", "attendanceDB.ser"
-    };
+   private static final String SOURCE_PATH = Paths.get(System.getProperty("user.dir"), "com", "storage").toString();
+   private static final String[] FILE_PATHS = new String[]{"studentDB.ser", "facultyDB.ser", "courseDB.ser", "studentCourseDB.ser", "facultyCourseDB.ser", "studentUserDB.ser", "facultyUserDB.ser", "examDB.ser", "sessionDB.ser", "attendanceDB.ser"};
+
     public static void loadDataBases() {
         StudentDB.loadDatabase(Paths.get(SOURCE_PATH, FILE_PATHS[0]).toString());
         FacultyDB.loadDatabase(Paths.get(SOURCE_PATH, FILE_PATHS[1]).toString());
@@ -31,8 +29,8 @@ public class Loader {
         );
         UserHandlesDB.loadDatabase(new String[]{
                 Paths.get(SOURCE_PATH, FILE_PATHS[5]).toString(),
-                Paths.get(SOURCE_PATH, FILE_PATHS[6]).toString()}
-        );
+                Paths.get(SOURCE_PATH, FILE_PATHS[6]).toString()
+        });
         ExamDB.loadDatabase(Paths.get(SOURCE_PATH, FILE_PATHS[7]).toString());
         SessionDB.loadDatabase(Paths.get(SOURCE_PATH, FILE_PATHS[8]).toString());
         AttendanceDB.loadDatabase(Paths.get(SOURCE_PATH, FILE_PATHS[9]).toString());
@@ -102,7 +100,7 @@ public class Loader {
                     codes[(int) (Math.random() * 10) % 4],
                     String.valueOf(i),
                     i % 8,
-                    i,
+                    i*1000,
                     4
             );
             FacultyDB.add(facutly);

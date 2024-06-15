@@ -10,9 +10,67 @@ public class AttendanceDB {
     // String = StudentId (roll no)
     static HashMap<String, entry> entries = new HashMap<>();
     static Boolean changed = false;
+
+    static class entry implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+        // String = CourseCode
+    private final HashMap<String, subEntry> attendance = new HashMap<>();
+
+    private static class subEntry implements Serializable {
+        int attended, conducted;
+
+        @Override
+        public String toString() {
+            var percentage = conducted == 0 ? 0 : (attended * 100) / conducted;
+            var stringPadded = String.format("%8s", String.valueOf(attended) + '/' + conducted);
+            return stringPadded + "(" + percentage +"%)";
+        }
+    }
+
+    public entry(Course c) {
+        attendance.put(c.getCode(), new subEntry());
+    }
+    public void add(Course c, boolean what) {
+        var subEntry = attendance.computeIfAbsent(c.getCode(), k -> new subEntry());
+        subEntry.attended += what ? 1 : 0;
+        subEntry.conducted += 1;
+    }
+    public String getAttendance(Course c) {
+        return attendance.get(c.getCode()).toString();
+    }
+    public String getAttendance() {
+        StringBuilder sb = new StringBuilder();
+        for (var element : attendance.entrySet()) {
+            String courseCodePadded = String.format("%-6s", element.getKey());
+                    sb.append(courseCodePadded)
+                    .append(" Attendance ")
+                    .append(element.getValue())  // SubEntry P/A(%)
+                    .append("\n");
+        }
+        return sb.toString();
+    }
+    public void update(Course c, boolean what) {
+        var sub_entry = attendance.get(c.getCode());
+        sub_entry.attended += what ? 1 : Math.max(-1, -sub_entry.attended);
+    }
+    public void delete(Course c, boolean what) {
+        var sub_entry = attendance.get(c.getCode());
+        sub_entry.attended -=  what ? Math.min(1, sub_entry.attended) : 0;
+        sub_entry.conducted -= Math.min(1, sub_entry.conducted);
+    }
+    public void remove(Course c) {
+        attendance.remove(c.getCode());
+    }
+    @Override
+    public String toString() {
+        return getAttendance();
+    }
+}
+
     public static void add(Student st, Course course, boolean attendance) {
         changed = true;
-        entry _entry = entries.computeIfAbsent(st.getRollNo(), k ->new entry(course));
+        entry _entry = entries.computeIfAbsent(st.getRollNo(), k -> new entry(course));
         _entry.add(course, attendance);
     }
     public static String getEntry(Student s) {
@@ -56,60 +114,59 @@ public class AttendanceDB {
     }
 }
 
-class entry implements Serializable {
-        @Serial
-    private static final long serialVersionUID = 1L;
-        // String = CourseCode
-    private final HashMap<String, subEntry> attendance = new HashMap<>();
-
-    private static class subEntry implements Serializable {
-        int attended, conducted;
-
-        @Override
-        public String toString() {
-            var percentage = conducted == 0 ? 0 : (attended * 100) / conducted;
-            var stringPadded = String.format("%8s", String.valueOf(attended) + '/' + conducted);
-            return stringPadded + "(" + percentage +"%)";
-        }
-    }
-
-    public entry(Course c) {
-//            attendance = new HashMap<>();
-        attendance.put(c.getCode(), new subEntry());
-    }
-    public void add(Course c, boolean what) {
-        var subEntry = attendance.computeIfAbsent(c.getCode(), k -> new subEntry());
-        subEntry.attended += what ? 1 : 0;
-        subEntry.conducted += 1;
-    }
-    public String getAttendance(Course c) {
-        return attendance.get(c.getCode()).toString();
-    }
-    public String getAttendance() {
-        StringBuilder sb = new StringBuilder();
-        for (var element : attendance.entrySet()) {
-            String courseCodePadded = String.format("%-6s", element.getKey());
-                    sb.append(courseCodePadded)
-                    .append(" Attendance ")
-                    .append(element.getValue())  // SubEntry P/A(%)
-                    .append("\n");
-        }
-        return sb.toString();
-    }
-    public void update(Course c, boolean what) {
-        var sub_entry = attendance.get(c.getCode());
-        sub_entry.attended += what ? 1 : Math.max(-1, -sub_entry.attended);
-    }
-    public void delete(Course c, boolean what) {
-        var sub_entry = attendance.get(c.getCode());
-        sub_entry.attended -=  what ? Math.min(1, sub_entry.attended) : 0;
-        sub_entry.conducted -= Math.min(1, sub_entry.conducted);
-    }
-    public void remove(Course c) {
-        attendance.remove(c.getCode());
-    }
-    @Override
-    public String toString() {
-        return getAttendance();
-    }
-}
+//class entry implements Serializable {
+//    @Serial
+//    private static final long serialVersionUID = 1L;
+//        // String = CourseCode
+//    private final HashMap<String, subEntry> attendance = new HashMap<>();
+//
+//    private static class subEntry implements Serializable {
+//        int attended, conducted;
+//
+//        @Override
+//        public String toString() {
+//            var percentage = conducted == 0 ? 0 : (attended * 100) / conducted;
+//            var stringPadded = String.format("%8s", String.valueOf(attended) + '/' + conducted);
+//            return stringPadded + "(" + percentage +"%)";
+//        }
+//    }
+//
+//    public entry(Course c) {
+//        attendance.put(c.getCode(), new subEntry());
+//    }
+//    public void add(Course c, boolean what) {
+//        var subEntry = attendance.computeIfAbsent(c.getCode(), k -> new subEntry());
+//        subEntry.attended += what ? 1 : 0;
+//        subEntry.conducted += 1;
+//    }
+//    public String getAttendance(Course c) {
+//        return attendance.get(c.getCode()).toString();
+//    }
+//    public String getAttendance() {
+//        StringBuilder sb = new StringBuilder();
+//        for (var element : attendance.entrySet()) {
+//            String courseCodePadded = String.format("%-6s", element.getKey());
+//                    sb.append(courseCodePadded)
+//                    .append(" Attendance ")
+//                    .append(element.getValue())  // SubEntry P/A(%)
+//                    .append("\n");
+//        }
+//        return sb.toString();
+//    }
+//    public void update(Course c, boolean what) {
+//        var sub_entry = attendance.get(c.getCode());
+//        sub_entry.attended += what ? 1 : Math.max(-1, -sub_entry.attended);
+//    }
+//    public void delete(Course c, boolean what) {
+//        var sub_entry = attendance.get(c.getCode());
+//        sub_entry.attended -=  what ? Math.min(1, sub_entry.attended) : 0;
+//        sub_entry.conducted -= Math.min(1, sub_entry.conducted);
+//    }
+//    public void remove(Course c) {
+//        attendance.remove(c.getCode());
+//    }
+//    @Override
+//    public String toString() {
+//        return getAttendance();
+//    }
+//}

@@ -46,6 +46,7 @@ public class FacultyUser implements University, Serializable
         Session session = new Session(time, Choices.getCourse(coursesCache, "Adding Session"), this.faculty);
         printHeader("Adding Session > Entering Attendance");
         session.takeAttendanceEntries();
+        UniversityApp.holdNextSlide();
         SessionDB.add(session);
     }
 

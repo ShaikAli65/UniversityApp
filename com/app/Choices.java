@@ -22,19 +22,19 @@ public class Choices {
         var faculties = FacultyDB.getFaculties().toList();
         return getChoice(faculties, headerDetail);
     }
-    public static Course  getCourse(String headerDetail) {
+    public static Course  getCourse (String headerDetail) {
         var allCourses = CourseDB.getCourses().toList();
         return getChoice(allCourses, headerDetail);
     }
-    public static Course  getCourse(StudentCourse sc, String headerDetail) {
+    public static Course  getCourse (StudentCourse sc, String headerDetail) {
         var allCourses = sc.getCourses();
         return getChoice(allCourses,headerDetail);
     }
-    public static Course  getCourse(FacultyCourse fc, String headerDetail) {
+    public static Course  getCourse (FacultyCourse fc, String headerDetail) {
         var allCourses = fc.getCourses();
         return getChoice(allCourses, headerDetail);
     }
-    public static Course  getCourse(int semester, String headerDetail) {
+    public static Course  getCourse (int semester, String headerDetail) {
         var courses = CourseDB.getCourses(semester).toList();
         return getChoice(courses, headerDetail);
     }
@@ -108,6 +108,9 @@ public class Choices {
             }
             var current = input.strip();
             list = resolveContext(current, list);
+            if(list.size() == 1) {
+                return list.get(0);
+            }
             if (list.isEmpty()) {
                 list = originalList;
             }
