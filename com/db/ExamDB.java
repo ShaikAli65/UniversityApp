@@ -2,7 +2,6 @@ package db;
 
 import app.academics.Course;
 import app.academics.Exam;
-import app.academics.FacultyCourse;
 import app.admin.Faculty;
 import app.admin.Student;
 
@@ -37,14 +36,14 @@ public class ExamDB {
         return exams.parallelStream()
                 .filter(exam -> exam.withCourse(course));
     }
-    public static Stream<Exam> getExams(FacultyCourse course) {
-        return exams.parallelStream()
-                .filter(exam -> course.getCourses().contains(exam.getCourse()));
-    }
+//    public static Stream<Exam> getExams(FacultyCourses course) {
+//        return exams.parallelStream()
+//                .filter(exam -> course.contains(exam.getCourse()));
+//    }
     public static Stream<Exam> getExams(Faculty faculty) {
         var courses =  CourseDB.getCourses(faculty);
         return exams.stream()
-                .filter(exam -> courses.contains(exam.getCourse()));
+                .filter(exam -> courses.contains(exam.getCourseCode()));
     }
     public static boolean isEmpty() {
         return exams.isEmpty();

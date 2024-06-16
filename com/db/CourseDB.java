@@ -1,8 +1,8 @@
 package db;
 
 import app.academics.Course;
-import app.academics.FacultyCourse;
-import app.academics.StudentCourse;
+import app.academics.FacultyCourses;
+import app.academics.StudentCourses;
 import app.admin.Faculty;
 import app.admin.Student;
 
@@ -14,19 +14,19 @@ import java.util.stream.Stream;
 
 
 public class CourseDB {
-    final private static HashMap<String, FacultyCourse> facultyCourses = new HashMap<>();
-	final private static HashMap<String, StudentCourse> studentCourses = new HashMap<>();
+    final private static HashMap<String, FacultyCourses> facultyCourses = new HashMap<>();
+	final private static HashMap<String, StudentCourses> studentCourses = new HashMap<>();
     final private static HashMap<String, Course> courses = new HashMap<>();
     private static Boolean changed = false;
     public static void addCourse(Course course) {
         changed = true;
         courses.put(course.getCode(),course);
     }
-    public static void updateCourse(Student student, StudentCourse course) {
+    public static void updateCourse(Student student, StudentCourses course) {
         changed = true;
         studentCourses.put(student.getRollNo(), course);
     }
-    public static void updateCourse(Faculty faculty, FacultyCourse course) {
+    public static void updateCourse(Faculty faculty, FacultyCourses course) {
         changed = true;
         facultyCourses.put(faculty.getEmpCode(), course);
     }
@@ -34,38 +34,38 @@ public class CourseDB {
         changed = true;
         courses.remove(course.getCode());
     }
-    public static StudentCourse getCourses(Student student) {
+    public static StudentCourses getCourses(Student student) {
         return studentCourses.get(student.getRollNo());
     }
-    public static FacultyCourse getCourses(Faculty faculty) {
-        return facultyCourses.get(faculty.getEmpCode());
+    public static FacultyCourses getCourses(Faculty faculty) {
+         return facultyCourses.get(faculty.getEmpCode());
     }
     public static Stream<Course>  getCourses (int semester) {
         return courses.values().parallelStream().filter(course -> course.getSemester() == semester);
     }
     public static Stream<Student> getStudentsWithCourse(Course course) {
         return StudentDB.getStudents().filter(
-                student -> studentCourses.containsKey(student.getRollNo())
-                        && studentCourses.get(student.getRollNo()).contains(course)
+                student -> studentCourses.getOrDefault(student.getRollNo(), new StudentCourses())
+                        .contains(course)
         );
     }
     public static Stream<Student> getStudentsWithCourse(String courseCode) {
         return StudentDB.getStudents().filter(
-                student -> studentCourses.containsKey(student.getRollNo())
-                        && studentCourses.get(student.getRollNo()).contains(courses.get(courseCode))
+                student -> studentCourses.getOrDefault(student.getRollNo(), new StudentCourses())
+                        .contains(courses.get(courseCode))
         );
     }
     public static Stream<Faculty> getFacultiesForCourse(Course course) {
         return FacultyDB.getFaculties().filter(
-                faculty -> facultyCourses.containsKey(faculty.getEmpCode())
-                        && facultyCourses.get(faculty.getEmpCode()).contains(course)
+                faculty -> facultyCourses.getOrDefault(faculty.getEmpCode(),new FacultyCourses())
+                        .contains(course)
         );
     }
     public static Stream<Faculty> getFacultiesForCourse(String courseId) {
         var course = courses.get(courseId);
         return FacultyDB.getFaculties().filter(
-                faculty -> facultyCourses.containsKey(faculty.getEmpCode())
-                        && facultyCourses.get(faculty.getEmpCode()).contains(course)
+                faculty -> facultyCourses.getOrDefault(faculty.getEmpCode(), new FacultyCourses())
+                        .contains(course)
         );
     }
 
@@ -92,13 +92,13 @@ public class CourseDB {
 
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName[1]))) {
             studentCourses.clear();
-            var _studentCourses = (HashMap<String, StudentCourse>) inputStream.readObject();
+            var _studentCourses = (HashMap<String, StudentCourses>) inputStream.readObject();
             studentCourses.putAll(_studentCourses);
         } catch (IOException | ClassNotFoundException ignored) {}
 
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName[2]))) {
             facultyCourses.clear();
-            var _courses = (HashMap<String, FacultyCourse>) inputStream.readObject();
+            var _courses = (HashMap<String, FacultyCourses>) inputStream.readObject();
             facultyCourses.putAll(_courses);
         } catch (IOException | ClassNotFoundException ignored) {}
     }

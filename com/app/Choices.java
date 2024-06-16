@@ -2,8 +2,8 @@ package app;
 
 import app.academics.Course;
 import app.academics.Exam;
-import app.academics.FacultyCourse;
-import app.academics.StudentCourse;
+import app.academics.FacultyCourses;
+import app.academics.StudentCourses;
 import app.admin.Faculty;
 import app.admin.Student;
 import app.faculty.Session;
@@ -27,11 +27,11 @@ public class Choices {
         var allCourses = CourseDB.getCourses().toList();
         return getChoice(allCourses, headerDetail);
     }
-    public static Course  getCourse (StudentCourse sc, String headerDetail) {
+    public static Course  getCourse (StudentCourses sc, String headerDetail) {
         var allCourses = sc.getCourses();
         return getChoice(allCourses,headerDetail);
     }
-    public static Course  getCourse (FacultyCourse fc, String headerDetail) {
+    public static Course  getCourse (FacultyCourses fc, String headerDetail) {
         var allCourses = fc.getCourses();
         return getChoice(allCourses, headerDetail);
     }
@@ -81,9 +81,8 @@ public class Choices {
                 System.out.println("No Results Found use \\ to print all users");
             }
             print(list);
-            System.out.println("results for : " + searchedString);
-            System.out.print("Enter index use '/' ->filter '.' ->back " +
-                    list.size()+" results"+": ");
+            System.out.println(list.size()+" results for : " + searchedString);
+            System.out.print("Enter index (use '/' ->filter '.' ->back): ");
             if(scanner.hasNextInt()){
                 int i = Integer.parseInt(scanner.next());
                 if (i < 0 || i > list.size()) {
@@ -189,18 +188,13 @@ public class Choices {
     private static List<Session> sessionContext(String checkFor, List<Session> list) {
         String _check = checkFor.toLowerCase();
         return list.stream().filter(
-                session -> session.getCourse().getCode().toLowerCase().contains(_check)
-                || session.getCourse().getName().toLowerCase().contains(_check)
-                || session.getTime().toString().contains(_check)
+                session -> session.matchContains(_check)
         ).sorted().toList();
     }
     private static List<Exam>    examContext(String checkFor, List<Exam> list) {
         String _check = checkFor.toLowerCase();
         return list.stream().filter(
-                exam -> exam.getCourse().getCode().toLowerCase().contains(_check)
-                        || exam.getCourse().getName().toLowerCase().contains(_check)
-                        || exam.getExamDate().toString().contains(_check)
-        ).sorted().toList();
+                exam -> exam.matchContains(_check)).sorted().toList();
     }
 
     public static <T> void print(List<T> tList ) {

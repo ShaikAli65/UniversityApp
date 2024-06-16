@@ -47,10 +47,10 @@ public class UniversityApp implements University {
     }
 
     public static void main(String[] ar) {
-        //   Loader.dupData();
-        //   Loader.storeDataBases();
+//           Loader.dupData();
+//           Loader.storeDataBases();
         UniversityApp.makeClear();
-        Loader.loadDataBases();
+         Loader.loadDataBases();
         System.out.println("\nlaunching");
         UniversityApp university = new UniversityApp();
         university.display();

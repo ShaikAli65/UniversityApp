@@ -3,7 +3,7 @@ package app.academics;
 import app.Date;
 import app.University;
 import app.UniversityApp;
-import app.admin.*;
+import app.admin.Student;
 import db.CourseDB;
 import db.StudentDB;
 
@@ -21,19 +21,20 @@ public class Exam implements Serializable, Comparable<Exam> {
 
     final private Date date;
     private boolean isEvaluated;
-    private transient Course course;
+    private final String courseCode;
     private transient Map<Student, Integer> marksStudents;
+//    private final Map<Student, Integer> marksStudents;
 
     public Exam(Date d, Course course){
         date = d;
-        this.course = course;
+        this.courseCode = course.getCode();
         marksStudents = new HashMap<>();
         this.isEvaluated = false;
     }
 
     public Exam(Date d, Course course, HashMap<Student, Integer> marksStudents){
         date = d;
-        this.course = course;
+        this.courseCode = course.getCode();
         this.marksStudents = marksStudents;
         this.isEvaluated = true;
     }
@@ -42,8 +43,8 @@ public class Exam implements Serializable, Comparable<Exam> {
 
     public void getMarksEntriesFromInput() {
         System.out.println("Enter Marks of respective students\n");
-        Stream<Student> students = CourseDB.getStudentsWithCourse(course);
-        students.forEach(student -> {
+        Stream<Student> students = CourseDB.getStudentsWithCourse(courseCode);
+        students.sequential().forEach(student -> {
             System.out.print("ROLL NO : " + student.getRollNo() + "\tMarks : ");
             var marks = University.getIntegerFromInput();
             add(student, marks);
@@ -95,23 +96,29 @@ public class Exam implements Serializable, Comparable<Exam> {
     }
     public void remove(Student student) { marksStudents.remove(student); }
     public void markEvaluated() { isEvaluated = true; }
-    public Course  getCourse() { return course; }
+    public String getCourseCode() { return courseCode; }
     public Date    getExamDate() { return date; }
-    public boolean withCourse(Course course) { return this.course.equals(course); }
-
+    public boolean withCourse(Course course) { return this.courseCode.equals(course.getCode()); }
+    public boolean matchContains(String _check) {
+        var course = CourseDB.get(courseCode);
+        return courseCode.toLowerCase().contains(_check)
+                        || course.getName().toLowerCase().contains(_check)
+                        || date.toString().contains(_check);
+    }
     public String toString() {
+        var course = CourseDB.get(courseCode);
         String paddedName = String.format("%-20s", course.getName());
         return date.toString()
-                + "\tCOURSE: " + course.getCode()
+                + "\tCOURSE: " + courseCode
                 + "\t"+ paddedName
                 + "\t"+ "graded: " + (isEvaluated ? "Y" : "N");
     }
-    @Override public int hashCode() { return Objects.hash(date, course); }
+    @Override public int hashCode() { return Objects.hash(date, courseCode); }
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Exam exam = (Exam) o;
-        return Objects.equals(date, exam.date) && Objects.equals(course, exam.course);
+        return Objects.equals(date, exam.date) && Objects.equals(courseCode, exam.courseCode);
     }
     @Override public int compareTo(Exam o) { return this.date.compareTo(o.date); }
 
@@ -119,8 +126,6 @@ public class Exam implements Serializable, Comparable<Exam> {
     @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
-        var courseCode = (String) ois.readObject();
-        this.course = CourseDB.get(courseCode);
         try {
             this.marksStudents = new HashMap<>();
             var marksStudents = (HashMap<String, Integer>) ois.readObject();
@@ -136,7 +141,6 @@ public class Exam implements Serializable, Comparable<Exam> {
     @Serial
     private void writeObject(ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
-        oos.writeObject(this.course.getCode());
         var attendeeIds = this.marksStudents.entrySet()
                 .stream()
                 .collect(Collectors.toMap(
@@ -144,6 +148,5 @@ public class Exam implements Serializable, Comparable<Exam> {
                         Map.Entry::getValue
                 ));
         oos.writeObject(attendeeIds);
-//        System.out.println("Exam data Saved"+this.date+" "+this.course.getCode()); // Debug
     }
 }

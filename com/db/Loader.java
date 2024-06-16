@@ -4,8 +4,8 @@ import app.Date;
 import app.Time;
 import app.academics.Course;
 import app.academics.Exam;
-import app.academics.FacultyCourse;
-import app.academics.StudentCourse;
+import app.academics.FacultyCourses;
+import app.academics.StudentCourses;
 import app.admin.Faculty;
 import app.admin.Student;
 import app.faculty.Session;
@@ -53,9 +53,9 @@ public class Loader {
         System.out.print("\rLoading Databases");
         ExamDB.loadDatabase(FILE_PATHS[7]);
         System.out.print('.');
-        SessionDB.loadDatabase(FILE_PATHS[8]);
-        System.out.print('.');
         AttendanceDB.loadDatabase(FILE_PATHS[9]);
+        System.out.print('.');
+        SessionDB.loadDatabase(FILE_PATHS[8]);
         System.out.print('.');
     }
     public static void storeDataBases() {
@@ -71,8 +71,8 @@ public class Loader {
                 FILE_PATHS[6]
         });
         ExamDB.saveData(FILE_PATHS[7]);
-        SessionDB.saveData(FILE_PATHS[8]);
         AttendanceDB.saveData(FILE_PATHS[9]);
+        SessionDB.saveData(FILE_PATHS[8]);
     }
 
     public static void dupData() {
@@ -165,17 +165,17 @@ public class Loader {
             // get a random 4 courses
             var selectedCourses = courses.collect(Collectors.toList());
             Collections.shuffle(selectedCourses);
-            var sc = new StudentCourse(student, new HashSet<>(selectedCourses.subList(0, 4)));
+            var sc = new StudentCourses(student, new HashSet<>(selectedCourses.subList(0, 4)));
             CourseDB.updateCourse(student, sc);
         });
         System.out.println("Duplicating Faculty Courses");
         var faculties = FacultyDB.getFaculties();
-        faculties.forEach(faculty -> {
+        faculties.sequential().forEach(faculty -> {
             var courses = CourseDB.getCourses();
             // get a random 4 courses
             var selectedCourses = courses.collect(Collectors.toList());
             Collections.shuffle(selectedCourses);
-            var fc = new FacultyCourse(faculty, new HashSet<>(selectedCourses.subList(0, 4)));
+            var fc = new FacultyCourses(faculty, new HashSet<>(selectedCourses.subList(0, 4)));
             CourseDB.updateCourse(faculty, fc);
         });
     }
@@ -220,7 +220,7 @@ public class Loader {
                 students.forEach(student -> {
                     var attendance = Math.random() > 0.2;
                     attendees.put(student, attendance);
-                    AttendanceDB.add(student, course, attendance);
+                    AttendanceDB.add(student, course.getCode(), attendance);
                 });
                 var s =  new Session(new Time(days.get(1), days.get(0), months.get(0),2022), course, faculty, attendees);
                 SessionDB.add(s);

@@ -101,7 +101,7 @@ public class AcademicsApp implements University {
 		if (student == null) return;
 		var studentCourse = CourseDB.getCourses(student);
 		if (studentCourse == null) {
-			studentCourse = new StudentCourse(student);
+			studentCourse = new StudentCourses(student);
 		}
 
 		if(CourseDB.isEmpty()){UniversityApp.getError(12); return;}
@@ -143,7 +143,7 @@ public class AcademicsApp implements University {
 		var faculty = Choices.getFaculty("Adding Faculty Courses");
 		if(faculty == null){return;}
 
-		var facultyCourse = new FacultyCourse(faculty);
+		var facultyCourse = new FacultyCourses(faculty);
 		if(CourseDB.isEmpty()){System.out.println("No courses Available");return;}
 
 		printHeader("Adding Faculty Courses");

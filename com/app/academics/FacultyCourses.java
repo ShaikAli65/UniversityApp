@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.HashSet;
 import java.util.List;
 
-public class FacultyCourse implements Serializable
+public class FacultyCourses implements Serializable
 {
 	@Serial
 	private static final long serialVersionUID = 1L;
@@ -16,12 +16,16 @@ public class FacultyCourse implements Serializable
 	private int count;
 	private final int noCourses;
 
-	public FacultyCourse(Faculty f) {
+	public FacultyCourses(Faculty f) {
 		noCourses = f.getNoCourses();
 		courses = new HashSet<>(noCourses);
 		count = 0;
 	}
-	public FacultyCourse(Faculty f, HashSet<Course> c) {
+	public FacultyCourses() {
+		noCourses = 0;
+		courses = new HashSet<>();
+	}
+	public FacultyCourses(Faculty f, HashSet<Course> c) {
 		noCourses = f.getNoCourses();
 		courses = c;
 		count = c.size();
@@ -58,7 +62,10 @@ public class FacultyCourse implements Serializable
 	public boolean contains(Course c) {
 		return courses.contains(c);
 	}
-
+	public boolean contains(String cCode) {
+		var c = CourseDB.get(cCode);
+		return courses.contains(c);
+	}
 	// Getters
 
 	public boolean hasCourse(Course course) {

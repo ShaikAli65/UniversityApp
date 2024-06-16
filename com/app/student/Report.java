@@ -2,7 +2,7 @@ package app.student;
 
 import app.Date;
 import app.academics.Course;
-import app.academics.StudentCourse;
+import app.academics.StudentCourses;
 
 
 public class Report
@@ -15,7 +15,7 @@ public class Report
     private final int totalMarks;
     private final int totalCredits;
 
-    public Report(StudentCourse studentCourse, Course course, Date date, int attendance, int totalSessions, int totalExams, int totalMarks, int totalCredits) {
+    public Report(StudentCourses studentCourses, Course course, Date date, int attendance, int totalSessions, int totalExams, int totalMarks, int totalCredits) {
         this.course = course;
         this.date = date;
         this.attendance = attendance;

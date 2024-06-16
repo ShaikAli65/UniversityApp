@@ -21,7 +21,7 @@ public class SessionDB {
     public static void remove(Course course) {
         changed=true;
         sessions.parallelStream().forEach(session -> {
-            if (session.isOfCourse(course)) {
+            if (session.isOfCourse(course.getCode())) {
                 sessions.remove(session);
             }
         });
@@ -35,12 +35,12 @@ public class SessionDB {
         return sessions
                 .stream()
                 .filter(
-                        session -> session.withFaculty(faculty)
-                ).sorted();
+                        session -> session.withFaculty(faculty.getEmpCode())
+                );
 
     }
-    public static Stream<Session> getSessions(Course course) {
-        return sessions.stream().filter(session -> session.isOfCourse(course));
+    public static Stream<Session> getSessions(String courseCode) {
+        return sessions.stream().filter(session -> session.isOfCourse(courseCode));
     }
 
     public static boolean isEmpty() {
@@ -53,7 +53,6 @@ public class SessionDB {
             var _sessions = (ArrayList<Session>) inputStream.readObject();
             sessions.addAll(_sessions);
         } catch (IOException | ClassNotFoundException ignored) {}
-        // System.out.println("Session data Loaded");
     }
     public static void saveData(String sessionFile) {
         if (!changed) return;

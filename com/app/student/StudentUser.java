@@ -4,7 +4,7 @@ import app.Choices;
 import app.University;
 import app.UniversityApp;
 import app.academics.Course;
-import app.academics.StudentCourse;
+import app.academics.StudentCourses;
 import app.admin.Student;
 import db.AttendanceDB;
 import db.CourseDB;
@@ -39,9 +39,7 @@ public class StudentUser implements University, Serializable
         if(courseCode.contains(".")) return;
 
         printHeader("Attendance > Detailed View");
-        var courses = retrieveCourses();
-        var choosenCourse = courses.getCourse(courseCode);
-        System.out.println(getCourseAttendance(choosenCourse));
+        System.out.println(getCourseAttendance(courseCode));
         UniversityApp.holdNextSlide();
     }
     public void seeExam() {
@@ -70,19 +68,19 @@ public class StudentUser implements University, Serializable
         UniversityApp.holdNextSlide();
     }
 
-    private StudentCourse retrieveCourses() {return CourseDB.getCourses(this.student);}
-    private String getCourseAttendance(Course course) {
+    private StudentCourses retrieveCourses() {return CourseDB.getCourses(this.student);}
+    private String getCourseAttendance(String courseCode) {
         StringBuilder resultString = new StringBuilder();
         resultString.append("\n\n");
-        var sessions = SessionDB.getSessions(course);
+        var sessions = SessionDB.getSessions(courseCode).sorted();
 
-        sessions.sorted().forEach(session ->
+        sessions.forEach(session ->
                 resultString.append("[")
                             .append(session.getTime())
                             .append("]\t: ")
                             .append(session.getAttendance(this.student) ? "Present" : "Absent")
                             .append("\n"));
-        resultString.append("\n\nCOURSE :").append(course).append('\n');
+        resultString.append("\n\nCOURSE :").append(CourseDB.get(courseCode)).append('\n');
         return resultString.toString();
     }
 

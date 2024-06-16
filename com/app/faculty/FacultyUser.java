@@ -66,7 +66,7 @@ public class FacultyUser implements University, Serializable
             UniversityApp.holdNextSlide();
             return;
         }
-        printHeader("Updating Session >" + session.getTime() + " " + session.getCourse().getCode());
+        printHeader("Updating Session >" + session.getTime() + " " + session.getCourse());
         session.updateSession();
         SessionDB.update(session);
     }

@@ -28,11 +28,11 @@ public class AttendanceDB {
         }
     }
 
-    public entry(Course c) {
-        attendance.put(c.getCode(), new subEntry());
+    public entry(String cCode) {
+        attendance.put(cCode, new subEntry());
     }
-    public void add(Course c, boolean what) {
-        var subEntry = attendance.computeIfAbsent(c.getCode(), k -> new subEntry());
+    public void add(String c, boolean what) {
+        var subEntry = attendance.computeIfAbsent(c, k -> new subEntry());
         subEntry.attended += what ? 1 : 0;
         subEntry.conducted += 1;
     }
@@ -50,12 +50,12 @@ public class AttendanceDB {
         }
         return sb.toString();
     }
-    public void update(Course c, boolean what) {
-        var sub_entry = attendance.get(c.getCode());
+    public void update(String cCode, boolean what) {
+        var sub_entry = attendance.get(cCode);
         sub_entry.attended += what ? 1 : Math.max(-1, -sub_entry.attended);
     }
-    public void delete(Course c, boolean what) {
-        var sub_entry = attendance.get(c.getCode());
+    public void delete(String cCode, boolean what) {
+        var sub_entry = attendance.get(cCode);
         sub_entry.attended -=  what ? Math.min(1, sub_entry.attended) : 0;
         sub_entry.conducted -= Math.min(1, sub_entry.conducted);
     }
@@ -68,7 +68,7 @@ public class AttendanceDB {
     }
 }
 
-    public static void add(Student st, Course course, boolean attendance) {
+    public static void add(Student st, String course, boolean attendance) {
         changed = true;
         entry _entry = entries.computeIfAbsent(st.getRollNo(), k -> new entry(course));
         _entry.add(course, attendance);
@@ -78,15 +78,15 @@ public class AttendanceDB {
         if (!entries.containsKey(s.getRollNo())) return "No Attendance Data Found";
         return entries.get(s.getRollNo()).toString();
     }
-    public static void update(Student st, Course course, boolean what) {
+    public static void update(Student st, String courseCode, boolean what) {
         changed = true;
-        var entry = entries.computeIfAbsent(st.getRollNo(), k -> new entry(course));
-        entry.update(course, what);
+        var entry = entries.computeIfAbsent(st.getRollNo(), k -> new entry(courseCode));
+        entry.update(courseCode, what);
     }
-    public static void delete(Student st, Course c, boolean what) {
+    public static void delete(Student st, String cCode, boolean what) {
         changed = true;
-        var entry = entries.computeIfAbsent(st.getRollNo(), k -> new entry(c));
-        entry.delete(c, what);
+        var entry = entries.computeIfAbsent(st.getRollNo(), k -> new entry(cCode));
+        entry.delete(cCode, what);
     }
     public static void remove(Student st) {
         changed = true;

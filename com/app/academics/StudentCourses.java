@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.HashSet;
 import java.util.List;
 
-public class StudentCourse implements Serializable
+public class StudentCourses implements Serializable
 {
 	@Serial
 	private static final long serialVersionUID = 1L;
@@ -16,12 +16,16 @@ public class StudentCourse implements Serializable
 	private int count;
 	private final int noCourses;
 
-	public StudentCourse(Student student) {
+	public StudentCourses(Student student) {
 		noCourses = student.getNoCourses();
 		courses = new HashSet<>(noCourses);
 		count = 0;
 	}
-	public StudentCourse(Student student, HashSet<Course> courses) {
+	public StudentCourses() {
+		noCourses = 0;
+		courses = new HashSet<>();
+	}
+	public StudentCourses(Student student, HashSet<Course> courses) {
 		noCourses = student.getNoCourses();
 		this.courses = courses;
 		count = courses.size();

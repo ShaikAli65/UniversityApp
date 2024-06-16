@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class  Student extends Person implements Comparable<Student>//, Serializable
 {
-	private static Scanner scanner = University.scanner;
+	private static final Scanner scanner = University.scanner;
 	protected String rollNo;
 	protected String branch;
 	private int semester;
