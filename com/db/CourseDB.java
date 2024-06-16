@@ -41,7 +41,7 @@ public class CourseDB {
         return facultyCourses.get(faculty.getEmpCode());
     }
     public static Stream<Course>  getCourses (int semester) {
-        return courses.values().stream().parallel().filter(course -> course.getSemester() == semester);
+        return courses.values().parallelStream().filter(course -> course.getSemester() == semester);
     }
     public static Stream<Student> getStudentsWithCourse(Course course) {
         return StudentDB.getStudents().filter(
@@ -105,7 +105,7 @@ public class CourseDB {
 
     public static void saveData(String[] fileNames) {
         if (!changed) return;
-        Arrays.asList(fileNames).forEach(fileName ->{
+        Arrays.asList(fileNames).forEach(fileName -> {
             try {
                 FileWriter writer = new FileWriter(Paths.get(fileName).toString());
                 writer.write("");

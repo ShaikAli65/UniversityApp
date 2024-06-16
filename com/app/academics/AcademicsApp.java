@@ -235,7 +235,7 @@ public class AcademicsApp implements University {
 		if(course == null){return;}
 		printHeader("Adding Exam >" + course.getCode());
 		var date = new app.Date();
-		date.newDate();
+		date.getNewDateFromStdIn();
 		var exam = new Exam(date, course);
 		ExamDB.add(exam);
 	}

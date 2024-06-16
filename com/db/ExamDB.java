@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class ExamDB {
-    final private static List<Exam> exams = new ArrayList<>();
+    final private static ArrayList<Exam> exams = new ArrayList<>();
     private static Boolean changed = false;
     public static void add(Exam exam) {
         changed = true;
@@ -28,19 +28,17 @@ public class ExamDB {
     }
     public static void remove(Student student) {
         changed = true;
-        exams.stream().parallel().forEach(exam -> exam.remove(student));
+        exams.parallelStream().forEach(exam -> exam.remove(student));
     }
     public static List<Exam> getExams() {
         return exams;
     }
     public static Stream<Exam> getExams(Course course) {
-        return exams.stream()
-                .parallel()
+        return exams.parallelStream()
                 .filter(exam -> exam.withCourse(course));
     }
     public static Stream<Exam> getExams(FacultyCourse course) {
-        return exams.stream()
-                .parallel()
+        return exams.parallelStream()
                 .filter(exam -> course.getCourses().contains(exam.getCourse()));
     }
     public static Stream<Exam> getExams(Faculty faculty) {
@@ -56,7 +54,7 @@ public class ExamDB {
     public static void loadDatabase(String examFile) {
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(examFile))) {
             exams.clear();
-            var _exams = (List<Exam>) inputStream.readObject();
+            var _exams = (ArrayList<Exam>) inputStream.readObject();
             exams.addAll(_exams);
         } catch (IOException | ClassNotFoundException ignored) {}
     }

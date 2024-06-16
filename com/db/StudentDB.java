@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.stream.Stream;
 
 public class StudentDB {
-    private static final HashMap<String, Student> students = new HashMap<>();
+    private final static HashMap<String, Student> students = new HashMap<>();
     private static Boolean changed = false;
     public static boolean isEmpty() {
         return students.isEmpty();

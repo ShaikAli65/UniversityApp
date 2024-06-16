@@ -13,44 +13,68 @@ import app.faculty.Session;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class Loader {
    private static final String SOURCE_PATH = Paths.get(System.getProperty("user.dir"), "com", "storage").toString();
-   private static final String[] FILE_PATHS = new String[]{"studentDB.ser", "facultyDB.ser", "courseDB.ser", "studentCourseDB.ser", "facultyCourseDB.ser", "studentUserDB.ser", "facultyUserDB.ser", "examDB.ser", "sessionDB.ser", "attendanceDB.ser"};
+   private static final String[] FILE_PATHS = Stream.of(
+        "studentDB.ser",
+        "facultyDB.ser",
+        "courseDB.ser",
+        "studentCourseDB.ser",
+        "facultyCourseDB.ser",
+        "studentUserDB.ser",
+        "facultyUserDB.ser",
+        "examDB.ser",
+        "sessionDB.ser",
+        "attendanceDB.ser"
+    )
+    .map(fileName -> Paths.get(SOURCE_PATH, fileName).toString())
+    .toArray(String[]::new);
 
     public static void loadDataBases() {
-        StudentDB.loadDatabase(Paths.get(SOURCE_PATH, FILE_PATHS[0]).toString());
-        FacultyDB.loadDatabase(Paths.get(SOURCE_PATH, FILE_PATHS[1]).toString());
+        System.out.print("Loading Databases");
+        StudentDB.loadDatabase(FILE_PATHS[0]);
+        System.out.print('.');
+        FacultyDB.loadDatabase(FILE_PATHS[1]);
+        System.out.print('.');
         CourseDB.loadDatabase(new String[]{
-                Paths.get(SOURCE_PATH, FILE_PATHS[2]).toString(),
-                Paths.get(SOURCE_PATH, FILE_PATHS[3]).toString(),
-                Paths.get(SOURCE_PATH, FILE_PATHS[4]).toString()}
-        );
+            FILE_PATHS[2],
+            FILE_PATHS[3],
+            FILE_PATHS[4]
+            });
+        System.out.print('.');
         UserHandlesDB.loadDatabase(new String[]{
-                Paths.get(SOURCE_PATH, FILE_PATHS[5]).toString(),
-                Paths.get(SOURCE_PATH, FILE_PATHS[6]).toString()
-        });
-        ExamDB.loadDatabase(Paths.get(SOURCE_PATH, FILE_PATHS[7]).toString());
-        SessionDB.loadDatabase(Paths.get(SOURCE_PATH, FILE_PATHS[8]).toString());
-        AttendanceDB.loadDatabase(Paths.get(SOURCE_PATH, FILE_PATHS[9]).toString());
+            FILE_PATHS[5],
+            FILE_PATHS[6]
+            });
+        System.out.print("\r                    ");
+        System.out.print("\rLoading Databases");
+        ExamDB.loadDatabase(FILE_PATHS[7]);
+        System.out.print('.');
+        SessionDB.loadDatabase(FILE_PATHS[8]);
+        System.out.print('.');
+        AttendanceDB.loadDatabase(FILE_PATHS[9]);
+        System.out.print('.');
     }
     public static void storeDataBases() {
-        StudentDB.saveData(Paths.get(SOURCE_PATH, FILE_PATHS[0]).toString());
-        FacultyDB.saveData(Paths.get(SOURCE_PATH, FILE_PATHS[1]).toString());
+        StudentDB.saveData(FILE_PATHS[0]);
+        FacultyDB.saveData(FILE_PATHS[1]);
         CourseDB.saveData(new String[]{
-                Paths.get(SOURCE_PATH, FILE_PATHS[2]).toString(),
-                Paths.get(SOURCE_PATH, FILE_PATHS[3]).toString(),
-                Paths.get(SOURCE_PATH, FILE_PATHS[4]).toString()}
+                FILE_PATHS[2],
+                FILE_PATHS[3],
+                FILE_PATHS[4]}
         );
         UserHandlesDB.saveData(new String[]{
-                Paths.get(SOURCE_PATH, FILE_PATHS[5]).toString(),
-                Paths.get(SOURCE_PATH, FILE_PATHS[6]).toString()
+                FILE_PATHS[5],
+                FILE_PATHS[6]
         });
-        ExamDB.saveData(Paths.get(SOURCE_PATH, FILE_PATHS[7]).toString());
-        SessionDB.saveData(Paths.get(SOURCE_PATH, FILE_PATHS[8]).toString());
-        AttendanceDB.saveData(Paths.get(SOURCE_PATH, FILE_PATHS[9]).toString());
+        ExamDB.saveData(FILE_PATHS[7]);
+        SessionDB.saveData(FILE_PATHS[8]);
+        AttendanceDB.saveData(FILE_PATHS[9]);
     }
+
     public static void dupData() {
         System.out.println("Duplicating Data...");
         dupStudentsAndFaculties();
@@ -64,7 +88,6 @@ public class Loader {
         dupSessions();
         System.out.println("Duplicated Sessions");
     }
-    
     private static void dupStudentsAndFaculties() {
                  List<String> names = Arrays.asList("Aarav", "Aarush", "Abhinav", "Aditya", "Akhil", "Aryan",
          "Ayush", "Dhruv", "Ishaan", "Kabir", "Mohit", "Nakul", "Naman",

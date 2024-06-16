@@ -41,21 +41,13 @@ public class Course implements Serializable
 
 	// Getters
 
-    public String getName() {
-		return name;
-    }
+    public String getName() {return name;}
 
-	public int getCredits() {
-		return credits;
-	}
+	public int getCredits() {return credits;}
 
-	public String getCode() {
-		return code;
-	}
+	public String getCode() {return code;}
 
-	public int getSemester() {
-		return semester;
-	}
+	public int getSemester() { return semester; }
 
 	// Display Functions
 
@@ -67,7 +59,6 @@ public class Course implements Serializable
 	
 		return paddedCode +  paddedName + "Credits: " + paddedCredits + "Semester: " + paddedSemester;
 	}
-	
 
 	@Override
 	public boolean equals(Object o) {
@@ -78,9 +69,7 @@ public class Course implements Serializable
 	}
 
 	@Override
-	public int hashCode() {
-		return Objects.hashCode(code);
-	}
+	public int hashCode() {return Objects.hashCode(code);}
 
 }
 

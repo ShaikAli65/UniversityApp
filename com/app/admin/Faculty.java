@@ -3,9 +3,11 @@ package app.admin;
 import app.*;
 
 import java.util.Objects;
+import java.util.Scanner;
 
 public class Faculty extends Person
 {
+	private static Scanner scanner = University.scanner;
 	private String empCode;
 	private String department;
 	private int experience;
@@ -60,12 +62,12 @@ public class Faculty extends Person
 		System.out.print("\nEnter  Name : "); this.name= scanner.next();
 		System.out.print("\nEnter  No of Teaching Courses : "); this.noCourses = University.getIntegerFromInput();
 		System.out.print("\nEmp code : "); this.empCode = scanner.next();
-//		System.out.print("\nEnter  DOB : "); this.setDOB(scanner.next());
-//		System.out.print("\nEnter  Mobile : "); this.mobile = University.getLongFromInput();
-//		System.out.print("\nEnter  Email Id : "); this.emailId  = scanner.next();
-//		System.out.print("\nEnter  Department : "); this.department  = scanner.next();
-//		System.out.print("\nEnter  Experience : "); this.experience = University.getIntegerFromInput();
-//		System.out.print("\nEnter  Salary : "); this.salary = University.getIntegerFromInput();
+		System.out.print("\nEnter  DOB : "); this.setDOB(scanner.next());
+		System.out.print("\nEnter  Mobile : "); this.mobile = University.getLongFromInput();
+		System.out.print("\nEnter  Email Id : "); this.emailId  = scanner.next();
+		System.out.print("\nEnter  Department : "); this.department  = scanner.next();
+		System.out.print("\nEnter  Experience : "); this.experience = University.getIntegerFromInput();
+		System.out.print("\nEnter  Salary : "); this.salary = University.getIntegerFromInput();
 		System.out.println();
 	}
 

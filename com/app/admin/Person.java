@@ -1,28 +1,27 @@
 package app.admin;
 
-import app.University;
+import app.Date;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.StringTokenizer;
 
 
-class Person implements University, Serializable
+class Person implements Serializable
 {
 	protected String name;
-	protected DOB dob;
+	protected Date dob;
 	protected String emailId;
 	protected long mobile;
 	Person() {
 		this.name = "";
-		this.dob = new DOB(0, 0, 0);
+		this.dob = new Date(0, 0, 0);
 		this.emailId = "";
 		this.mobile=0;
 	}
 
 	Person(String name, String dob, String emailId, long mobile) {
 		this.name = name;
-		this.dob = new DOB(dob);
+		this.dob = new Date(dob);
 		this.emailId = emailId;
 		this.mobile=mobile;
 	}
@@ -30,7 +29,7 @@ class Person implements University, Serializable
 	Person (String name)
 	{
 		this.name = name;
-		this.dob = new DOB("1-1-2000");
+		this.dob = new Date("1/1/2000");
 		this.emailId = "";
 		this.mobile = 0;
 	}
@@ -42,50 +41,9 @@ class Person implements University, Serializable
 				+"\n4. Mobile     : "+mobile;
 	}
 
-	@Override
-	public void printHeader(String out) {
-
-	}
-
 	void setDOB(String d)
 	{
-		this.dob= new DOB(d);
-	}
-
-	static class DOB implements Serializable{
-		final private int day;
-		final private int month;
-		final private int year;
-		DOB(int day, int month, int year)
-		{
-			this.day=day; 
-			this.month=month;
-			this.year=year;
-		}
-		DOB(String date)
-		{
-			String[]temp=new String[3];
-			int further=0;
-			StringTokenizer we=new StringTokenizer(date, "/ ,-");
-			if(we.countTokens()==3)
-			{
-				while(we.hasMoreTokens())
-				{
-					temp[further]=we.nextToken();
-					further++;
-				}
-				this.day=Integer.parseInt(temp[0]);
-				this.month=Integer.parseInt(temp[1]);
-				this.year=Integer.parseInt(temp[2]);
-			}
-			else if(date.length()==8){
-				this.day=Integer.parseInt(date.substring(0, 2));
-				this.month=Integer.parseInt(date.substring(2, 4));
-				this.year=Integer.parseInt(date.substring(4, 8));
-            }
-			else{this.day= 1;this.month= 1;this.year=2000;}
-		}
-		public String toString(){ return day+"-"+month+"-"+year; }
+		this.dob= new Date(d);
 	}
 
 	public String getName()
@@ -105,7 +63,7 @@ class Person implements University, Serializable
 		return this.mobile;
 	}
 
-	public void setDob(DOB dob) {
+	public void setDob(Date dob) {
 		this.dob = dob;
 	}
 

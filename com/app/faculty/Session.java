@@ -9,6 +9,7 @@ import app.admin.Student;
 import db.AttendanceDB;
 import db.CourseDB;
 import db.FacultyDB;
+import db.SessionDB;
 import db.StudentDB;
 
 import java.io.*;
@@ -113,7 +114,12 @@ public class Session implements Serializable, Comparable<Session> {
         }
     }
     public void remove(Student student) {attendees.remove(student);}
-
+    public void delete() {
+        for (var entry : attendees.entrySet()) {
+            AttendanceDB.delete(entry.getKey(), course, entry.getValue());
+        }
+        SessionDB.remove(this);
+    }
 
     public Map<Student, Boolean> getAttendees() {return attendees;}
     public Course  getCourse() {return course;}

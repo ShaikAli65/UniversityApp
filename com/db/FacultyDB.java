@@ -31,14 +31,23 @@ public class FacultyDB {
     }
 
     @SuppressWarnings("unchecked")
-    public static void loadDatabase(String fileDir) {
-        try (var inputStream = new ObjectInputStream(new FileInputStream(fileDir))) {
+    public static void loadDatabase(String filePath) {
+        try (var inputStream = new ObjectInputStream(new FileInputStream(filePath))) {
             faculties.clear(); // Clear existing data
             faculties.putAll((HashMap<String, Faculty>) inputStream.readObject());
         } catch (IOException | ClassNotFoundException ignored) {}
     }
 
-    public static void saveData(String fileDir) {
-
+    public static void saveData(String filePath) {
+        if (!changed) return;
+        try {
+                FileWriter writer = new FileWriter(filePath);
+                writer.write("");
+                writer.close();
+            } catch (IOException ignore) {}
+        try (var outputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
+            outputStream.writeObject(faculties);
+        } catch (IOException ignored) {}
+        System.out.println("Faculty data Saved");
     }
 }

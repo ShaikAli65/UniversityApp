@@ -24,7 +24,7 @@ public class Time implements Serializable, Comparable<Time>
     public void addTime(){
         System.out.print("Enter start time (24H) :");
         this.start = University.getIntegerFromInput();
-        date.newDate();
+        date.getNewDateFromStdIn();
     }
 
     @Override

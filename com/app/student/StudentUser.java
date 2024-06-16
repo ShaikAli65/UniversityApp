@@ -76,7 +76,7 @@ public class StudentUser implements University, Serializable
         resultString.append("\n\n");
         var sessions = SessionDB.getSessions(course);
 
-        sessions.forEach(session ->
+        sessions.sorted().forEach(session ->
                 resultString.append("[")
                             .append(session.getTime())
                             .append("]\t: ")

@@ -8,10 +8,10 @@ public class Date implements java.io.Serializable, Comparable<Date>
     private int month=0;
     private int year=0;
 
-    public Date(){
+    public Date(){}
+    public Date(String s) {
 
     }
-
     public Date(int day, int month, int year)
     {
         this.day=day; 
@@ -19,8 +19,8 @@ public class Date implements java.io.Serializable, Comparable<Date>
         this.year=year;
     }
 
-    public void newDate(){
-        System.out.print("Enter DD/MM/YYYY\t:");
+    public void getNewDateFromStdIn(){
+        System.out.print("Enter DD/MM/YYYY:");
         String x = UniversityApp.scanner.next();
         String[] ar = x.split("/");
         try {
@@ -29,7 +29,9 @@ public class Date implements java.io.Serializable, Comparable<Date>
             year=Integer.parseInt(ar[2]);
         }
         catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            day = month = year = 0;
+            day = 1;
+            month = 1;
+            year = 2000;
         }
     }
 

@@ -47,15 +47,16 @@ public class UniversityApp implements University {
     }
 
     public static void main(String[] ar) {
-//           Loader.dupData();
-//           Loader.storeDataBases();
-         UniversityApp.makeClear();
-         Loader.loadDataBases();
-         UniversityApp university = new UniversityApp();
-         university.display();
-         System.out.println("Saving Data...");
-         System.out.println("Data Saved Successfully");
-         Loader.storeDataBases();
+        //   Loader.dupData();
+        //   Loader.storeDataBases();
+        UniversityApp.makeClear();
+        Loader.loadDataBases();
+        System.out.println("\nlaunching");
+        UniversityApp university = new UniversityApp();
+        university.display();
+        System.out.println("Saving Data...");
+        System.out.println("Data Saved Successfully");
+        Loader.storeDataBases();
     }
 
     @Override

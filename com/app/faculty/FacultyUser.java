@@ -1,17 +1,16 @@
 package app.faculty;
 
+import java.io.Serializable;
+import java.util.Arrays;
+
 import app.Choices;
 import app.Time;
 import app.University;
 import app.UniversityApp;
 import app.admin.Faculty;
-import db.AttendanceDB;
 import db.CourseDB;
 import db.ExamDB;
 import db.SessionDB;
-
-import java.io.Serializable;
-import java.util.Arrays;
 
 public class FacultyUser implements University, Serializable
 {
@@ -79,10 +78,7 @@ public class FacultyUser implements University, Serializable
             return;
         }
         printHeader("Deleting Session");
-        for (var entry : session.getAttendees().entrySet()) {
-            AttendanceDB.delete(entry.getKey(), session.getCourse(), entry.getValue());
-        }
-        SessionDB.remove(session);
+        session.delete();
     }
 
     public void enterExamData() {
