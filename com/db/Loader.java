@@ -10,6 +10,7 @@ import app.admin.Faculty;
 import app.admin.Student;
 import app.faculty.Session;
 
+import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,7 +18,10 @@ import java.util.stream.Stream;
 
 
 public class Loader {
-   private static final String SOURCE_PATH = Paths.get(System.getProperty("user.dir"), "com", "storage").toString();
+   private static final String SOURCE_PATH = Paths.get(System.getProperty("user.dir"), "storage").toString();
+   public static final Path SessionsDir = Paths.get(SOURCE_PATH,"Sessions");
+   public static final Path TRASHDIR = Paths.get(SOURCE_PATH,"retarded");
+   public static final Path ExamsDir = Paths.get(SOURCE_PATH,"Exams");
    private static final String[] FILE_PATHS = Stream.of(
         "studentDB.ser",
         "facultyDB.ser",
@@ -26,14 +30,14 @@ public class Loader {
         "facultyCourseDB.ser",
         "studentUserDB.ser",
         "facultyUserDB.ser",
-        "examDB.ser",
-        "sessionDB.ser",
         "attendanceDB.ser"
     )
     .map(fileName -> Paths.get(SOURCE_PATH, fileName).toString())
     .toArray(String[]::new);
 
     public static void loadDataBases() {
+        checkPaths();
+        System.out.println(SOURCE_PATH);
         System.out.print("Loading Databases");
         StudentDB.loadDatabase(FILE_PATHS[0]);
         System.out.print('.');
@@ -51,13 +55,25 @@ public class Loader {
             });
         System.out.print("\r                    ");
         System.out.print("\rLoading Databases");
-        ExamDB.loadDatabase(FILE_PATHS[7]);
+        ExamDB.loadDatabase(ExamsDir.toString());
         System.out.print('.');
-        AttendanceDB.loadDatabase(FILE_PATHS[9]);
-        System.out.print('.');
-        SessionDB.loadDatabase(FILE_PATHS[8]);
-        System.out.print('.');
+        AttendanceDB.loadDatabase(FILE_PATHS[7]);
+        System.out.print("..");
     }
+
+    private static void checkPaths() {
+        if(! Files.exists(TRASHDIR)) {
+            try {
+                Files.createDirectory(TRASHDIR);
+            } catch (IOException e) {
+                System.out.println("Error finding and creating retarded directory");
+                System.out.println("Exiting");
+                System.exit(-1);
+            }
+        }
+
+    }
+
     public static void storeDataBases() {
         StudentDB.saveData(FILE_PATHS[0]);
         FacultyDB.saveData(FILE_PATHS[1]);
@@ -70,9 +86,10 @@ public class Loader {
                 FILE_PATHS[5],
                 FILE_PATHS[6]
         });
-        ExamDB.saveData(FILE_PATHS[7]);
-        AttendanceDB.saveData(FILE_PATHS[9]);
-        SessionDB.saveData(FILE_PATHS[8]);
+        ExamDB.saveData(ExamsDir.toString());
+        AttendanceDB.saveData(FILE_PATHS[7]);
+//        SessionDB.saveData(SessionsDir.toString());
+        SessionDB.saveData(Paths.get(SOURCE_PATH, "sessionDB.ser").toString());
     }
 
     public static void dupData() {
@@ -150,7 +167,9 @@ public class Loader {
         try {
             for (int i = 1; i <= 40; i++) {
                 var random = (int) (Math.random() * 10) % 4;
-                CourseDB.addCourse(new Course(courseNames.get(i), codes[random] + i, i % 4 + 1, 4));
+                var course = new Course(courseNames.get(i), codes[random] + i, i % 4 + 1, 4);
+                CourseDB.addCourse(course);
+                ExamDB.register(course);
             }
         } catch (Exception e) {
 //            System.out.println(e.toString());
@@ -225,6 +244,16 @@ public class Loader {
                 var s =  new Session(new Time(days.get(1), days.get(0), months.get(0),2022), course, faculty, attendees);
                 SessionDB.add(s);
             }
+        }
+    }
+
+    public static String stripExtension(Path filePath) {
+        String fileName = filePath.toString();
+        int lastDotIndex = fileName.lastIndexOf('.');
+        if (lastDotIndex == -1) {
+            return fileName;
+        } else {
+            return fileName.substring(0, lastDotIndex);
         }
     }
 }

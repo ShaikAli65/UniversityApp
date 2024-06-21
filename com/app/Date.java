@@ -18,10 +18,7 @@ public class Date implements java.io.Serializable, Comparable<Date>
         this.month=month;
         this.year=year;
     }
-
-    public void getNewDateFromStdIn(){
-        System.out.print("Enter DD/MM/YYYY:");
-        String x = UniversityApp.scanner.next();
+    public void setDate(String x) {
         String[] ar = x.split("/");
         try {
             day=Integer.parseInt(ar[0]);
@@ -29,10 +26,16 @@ public class Date implements java.io.Serializable, Comparable<Date>
             year=Integer.parseInt(ar[2]);
         }
         catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+            UniversityApp.getError(16);
             day = 1;
             month = 1;
             year = 2000;
         }
+    }
+    public void getNewDateFromStdIn(){
+        System.out.print("Enter DD/MM/YYYY:");
+        String x = University.getStringFromInput(true);
+        setDate(x);
     }
 
     public String toString(){

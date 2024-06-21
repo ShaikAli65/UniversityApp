@@ -85,6 +85,7 @@ public class AcademicsApp implements University {
 		var course = new Course();
 		course.readData();
 		CourseDB.addCourse(course);
+		ExamDB.register(course);
 	}
 
 	public void displayCourses() {
@@ -242,9 +243,11 @@ public class AcademicsApp implements University {
 
 	private void displayExams() {
 		if(ExamDB.isEmpty()){UniversityApp.getError(14);return;}
-		var exam = Choices.getExam("Displaying Exams");
+		var course = Choices.getCourse("Displaying Exams");
+		var exam = Choices.getExam(course,"Displaying Exams");
 		if(exam == null){return;}
 		printHeader("Displaying Exams > " + exam);
+		ExamDB.loadExam(exam);
 		exam.printExam();
 		UniversityApp.holdNextSlide();
 	}

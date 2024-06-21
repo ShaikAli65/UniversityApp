@@ -47,16 +47,20 @@ public class UniversityApp implements University {
     }
 
     public static void main(String[] ar) {
-//           Loader.dupData();
-//           Loader.storeDataBases();
+        //   Loader.dupData();
+        //   Loader.storeDataBases();
         UniversityApp.makeClear();
-         Loader.loadDataBases();
+        Loader.loadDataBases();
         System.out.println("\nlaunching");
-        UniversityApp university = new UniversityApp();
-        university.display();
-        System.out.println("Saving Data...");
-        System.out.println("Data Saved Successfully");
-        Loader.storeDataBases();
+
+        try {
+            UniversityApp university = new UniversityApp();
+            university.display();
+            System.out.println("Saving Data...");
+            System.out.println("Data Saved Successfully");
+        } finally {
+            Loader.storeDataBases();
+        }
     }
 
     @Override
@@ -161,14 +165,7 @@ public class UniversityApp implements University {
             case 5 -> System.out.println("\n\u001B[31m#ERROR://\u001B[0mNo Sessions Found... error code 005\n");
             case 6 -> System.out.println("\n\t\u001B[31mERROR://\u001B[0m INVALID CHOICE error code 006\t\n");
 
-            case 7 -> {
-                System.out.println("\u001B[31mERROR://\u001B[0mLooks like data does not contain any student with that index error code 007");
-                holdNextSlide();
-            }
-            case 8 -> {
-                System.out.println("\u001B[31mERROR://\u001B[0mLooks like data does not contain any faculty with that index error code 008");
-                holdNextSlide();
-            }
+            case 7 -> System.out.println("\u001B[31mERROR://\u001B[0mNot a valid input error code 007");
             case 9 -> {
                 System.out.println("\u001B[31mERROR://\u001B[0mLooks like data does not contain any Student  error code 009");
                 holdNextSlide();
@@ -193,7 +190,7 @@ public class UniversityApp implements University {
                 holdNextSlide();
             }
 
-            case 16 -> System.out.println("\u001B[31mERROR://\u001B[0mNot a Valid date.. error code 016\n");
+            case 16 -> System.out.println("\u001B[31mERROR://\u001B[0mNot a Valid date, defaulting... error code 016\n");
 
             case 17 -> System.out.println("\u001B[31mERROR://\u001B[0mNo exams are scheduled.. error code 017\n");
             case 18 -> {

@@ -8,6 +8,8 @@ import db.CourseDB;
 import db.StudentDB;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -15,31 +17,37 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
-public class Exam implements Serializable, Comparable<Exam> {
+public class Exam implements Externalizable, Comparable<Exam> {
     @Serial
     private static final long serialVersionUID = 1L;
-
-    final private Date date;
+    public String timeString;
+    private Date date;
     private boolean isEvaluated;
-    private final String courseCode;
-    private transient Map<Student, Integer> marksStudents;
-//    private final Map<Student, Integer> marksStudents;
+    private String courseCode;
+    private transient Map<Student, Integer> marks;
 
     public Exam(Date d, Course course){
         date = d;
         this.courseCode = course.getCode();
-        marksStudents = new HashMap<>();
+        marks = new HashMap<>();
         this.isEvaluated = false;
+        timeString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HHmmss"));
     }
 
     public Exam(Date d, Course course, HashMap<Student, Integer> marksStudents){
         date = d;
         this.courseCode = course.getCode();
-        this.marksStudents = marksStudents;
+        this.marks = marksStudents;
         this.isEvaluated = true;
+        timeString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HHmmss"));
     }
 
-    public void add(Student student, int marks) { marksStudents.put(student, marks); }
+    public Exam() {
+        timeString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HHmmss"));
+        marks = new HashMap<>();
+    }
+
+    public void add(Student student, int marks) { this.marks.put(student, marks); }
 
     public void getMarksEntriesFromInput() {
         System.out.println("Enter Marks of respective students\n");
@@ -52,14 +60,14 @@ public class Exam implements Serializable, Comparable<Exam> {
         students.close();
     }
     public int  getMarks(Student student) {
-        if (marksStudents.containsKey(student)){
-            return marksStudents.get(student);
+        if (marks.containsKey(student)){
+            return marks.get(student);
         }
         return 0;
     }
     public void printExam() {
         StringBuilder sb = new StringBuilder();
-        for (var entry : marksStudents.entrySet()) {
+        for (var entry : marks.entrySet()) {
             String paddedName = String.format("%-20s", entry.getKey().getName());
             sb.append(entry.getKey().getRollNo())
                     .append("\t")
@@ -73,33 +81,37 @@ public class Exam implements Serializable, Comparable<Exam> {
     }
 
     public void updateExam() {
-        if (marksStudents.isEmpty()) {
+        if (marks.isEmpty()) {
             UniversityApp.getError(11);
             return;
         }
-        printExam();
-        System.out.print("Enter the roll number of student to update marks:");
-        var rollNo = University.scanner.next();
-        marksStudents
-                .keySet()
-                .stream()
-                .filter(student -> student.getRollNo().equals(rollNo))
-                .findFirst()
-                .ifPresentOrElse(
-                        student -> {
+        while (true) {
+            printExam();
+            System.out.print("Enter the roll number of student to update marks 0 to return:");
+            var rollNo = University.getStringFromInput(false);
+            if (rollNo.isBlank() || rollNo.isEmpty()) continue;
+            if (Objects.equals(rollNo, "0")) return;
+            marks
+                    .keySet()
+                    .stream()
+                    .filter(student -> student.getRollNo().equals(rollNo))
+                    .findFirst()
+                    .ifPresentOrElse(
+                            student -> {
                                 System.out.print("Enter new marks : ");
                                 var marks = University.getIntegerFromInput();
-                                marksStudents.put(student, marks);
-                        },
-                        () -> UniversityApp.getError(6)
-                );
+                                this.marks.put(student, marks);
+                            },
+                            () -> UniversityApp.getError(6)
+                    );
+        }
     }
-    public void remove(Student student) { marksStudents.remove(student); }
+    public void remove(Student student) { marks.remove(student); }
     public void markEvaluated() { isEvaluated = true; }
     public String getCourseCode() { return courseCode; }
     public Date    getExamDate() { return date; }
     public boolean withCourse(Course course) { return this.courseCode.equals(course.getCode()); }
-    public boolean matchContains(String _check) {
+    public boolean matchExam(String _check) {
         var course = CourseDB.get(courseCode);
         return courseCode.toLowerCase().contains(_check)
                         || course.getName().toLowerCase().contains(_check)
@@ -113,40 +125,51 @@ public class Exam implements Serializable, Comparable<Exam> {
                 + "\t"+ paddedName
                 + "\t"+ "graded: " + (isEvaluated ? "Y" : "N");
     }
-    @Override public int hashCode() { return Objects.hash(date, courseCode); }
+    @Override public int hashCode() { return Objects.hash(date, courseCode, timeString); }
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Exam exam = (Exam) o;
-        return Objects.equals(date, exam.date) && Objects.equals(courseCode, exam.courseCode);
+        return Objects.equals(date, exam.date)
+                && Objects.equals(courseCode, exam.courseCode)
+                && Objects.equals(timeString, exam.timeString);
     }
     @Override public int compareTo(Exam o) { return this.date.compareTo(o.date); }
 
-    @Serial
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(this.timeString);
+        out.writeObject(this.courseCode);
+        out.writeObject(this.date);
+        out.writeObject(this.isEvaluated);
+        var stuIDs = this.marks.entrySet()
+                 .stream()
+                 .collect(Collectors.toMap(
+                         entry -> entry.getKey().getRollNo(),
+                         Map.Entry::getValue
+                 ));
+        out.writeObject(stuIDs);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
-    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
-        ois.defaultReadObject();
-        try {
-            this.marksStudents = new HashMap<>();
-            var marksStudents = (HashMap<String, Integer>) ois.readObject();
-            for (var entry : marksStudents.entrySet()) {
-                Student student = StudentDB.getStudent(entry.getKey());
-                this.marksStudents.put(student, entry.getValue());
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        this.timeString = (String) in.readObject();
+        this.courseCode = (String) in.readObject();
+        this.date = (Date) in.readObject();
+        this.isEvaluated = (boolean) in.readObject();
+        var stuIDs = (HashMap<String,Integer>) in.readObject();
+        for (var entry : stuIDs.entrySet()) {
+            Student student = StudentDB.getStudent(entry.getKey());
+            if (student != null){
+                this.marks.put(student, entry.getValue());
             }
         }
-        catch (ClassCastException e) {
-            this.marksStudents = new HashMap<>();
-        }
     }
-    @Serial
-    private void writeObject(ObjectOutputStream oos) throws IOException {
-        oos.defaultWriteObject();
-        var attendeeIds = this.marksStudents.entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        entry -> entry.getKey().getRollNo(),
-                        Map.Entry::getValue
-                ));
-        oos.writeObject(attendeeIds);
+    public void readView(ObjectInput in) throws IOException, ClassNotFoundException {
+        this.timeString = (String) in.readObject();
+        this.courseCode = (String) in.readObject();
+        this.date = (Date) in.readObject();
+        this.isEvaluated = (boolean) in.readObject();
     }
 }

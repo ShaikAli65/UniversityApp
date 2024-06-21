@@ -39,30 +39,6 @@ public class Choices {
         var courses = CourseDB.getCourses(semester).toList();
         return getChoice(courses, headerDetail);
     }
-    public static Session getSession(Faculty faculty, String headerDetail) {
-        var sessions= SessionDB.getSessions(faculty).sorted().toList();
-        if (sessions.isEmpty()) {
-            UniversityApp.getError(5);
-            return null;
-        }
-        return getChoice(sessions, headerDetail);
-    }
-    public static Exam    getExam(String headerDetail) {
-        var exams = ExamDB.getExams().stream().sorted().toList();
-        if (exams.isEmpty()) {
-            UniversityApp.getError(5);
-            return null;
-        }
-        return getChoice(exams, headerDetail);
-    }
-    public static Exam    getExam(Faculty faculty, String headerDetail) {
-        var exams = ExamDB.getExams(faculty).toList();
-        if (exams.isEmpty()) {
-            UniversityApp.getError(5);
-            return null;
-        }
-        return getChoice(exams, headerDetail);
-    }
     public static Exam    getExam(Course course, String headerDetail) {
         var exams = ExamDB.getExams(course).toList();
         if (exams.isEmpty()) {
@@ -72,7 +48,7 @@ public class Choices {
         return getChoice(exams, headerDetail);
     }
 
-    private static <T> T getChoice(List<T> originalList, String headerDetail) {
+    public static <T> T getChoice(List<T> originalList, String headerDetail) {
         var list = originalList;
         StringBuilder searchedString = new StringBuilder();
         while (true) {
@@ -96,11 +72,7 @@ public class Choices {
                 return list.get(list.size() - i);
             }
 
-            String input;
-            // to skip fake enters aka \n
-            do {
-                input = scanner.nextLine();
-            } while (input.isEmpty());
+            String input = University.getStringFromInput(true);
 
             if (input.contains(".")) {
                 return null;
@@ -188,13 +160,13 @@ public class Choices {
     private static List<Session> sessionContext(String checkFor, List<Session> list) {
         String _check = checkFor.toLowerCase();
         return list.stream().filter(
-                session -> session.matchContains(_check)
+                session -> session.matchSession(_check)
         ).sorted().toList();
     }
     private static List<Exam>    examContext(String checkFor, List<Exam> list) {
         String _check = checkFor.toLowerCase();
         return list.stream().filter(
-                exam -> exam.matchContains(_check)).sorted().toList();
+                exam -> exam.matchExam(_check)).sorted().toList();
     }
 
     public static <T> void print(List<T> tList ) {

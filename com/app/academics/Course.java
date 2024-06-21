@@ -20,7 +20,7 @@ public class Course implements Serializable
 	}
 
 	public Course(String name, String code, int semester, int credits) {
-		this.code = code;
+		this.code = code.toUpperCase();
 		this.name = name;
 		this.credits = credits;
 		this.semester = semester;
@@ -28,8 +28,8 @@ public class Course implements Serializable
 	// Utility Functions
 
 	public void readData() {
-		System.out.print("\nEnter  Course Code : ");String code = University.scanner.next();
-		System.out.print("\nEnter  name : ");String name = University.scanner.next();
+		System.out.print("\nEnter  Course Code : ");String code = University.getStringFromInput(false).toUpperCase();
+		System.out.print("\nEnter  name : ");String name = University.getStringFromInput(false);
 		System.out.print("\nEnter  Credits : ");
 		this.credits = University.getIntegerFromInput();
 		System.out.print("\nEnter  Semester : ");

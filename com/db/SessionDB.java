@@ -2,68 +2,152 @@ package db;
 
 import app.academics.Course;
 import app.admin.Faculty;
-import app.admin.Student;
 import app.faculty.Session;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
 public class SessionDB {
-    final private static ArrayList<Session> sessions = new ArrayList<>();
     private static Boolean changed = false;
-    public static void add(Session session) {changed=true;sessions.add(session);}
+    private static final int maxSize = 50;
+    private static final Cache<Session> sessionsCache = new Cache<>(maxSize, SessionDB::sessionString);
+    public static Path SessionsDir = Loader.SessionsDir;
+    public static final ArrayList<Session> retarded = new ArrayList<>();
+    public static String sessionString(Session session) {
+        return session.getCourseCode()
+                +"$"+session.getTime()+".ser";
+    }
+    public static void register(Faculty f) {
+        try {
+            var path = SessionsDir.resolve(f.getEmpCode());
+            if (! Files.exists(path))
+                Files.createDirectory(path);
+        } catch (IOException ignore) {}
+    }
+    public static void add(Session session) {
+        changed=true;
+        sessionsCache.cache(session);
+        writeSession(session);
+    }
     public static void update(Session session) {
         changed=true;
+        writeSession(session);
     }
-    public static void remove(Session session) {changed=true;sessions.remove(session);}
-    public static void remove(Course course) {
+    public static void remove(Session session) {
         changed=true;
-        sessions.parallelStream().forEach(session -> {
-            if (session.isOfCourse(course.getCode())) {
-                sessions.remove(session);
-            }
-        });
+        sessionsCache.remove(session);
+        var filePath = resolveSessionFile(session);
+        if (filePath.exists())
+            filePath.delete();
     }
-    public static void remove(Student student) {
-        changed=true;
-        sessions.parallelStream().forEach(session -> session.remove(student));
-    }
-    public static Stream<Session> getSessions() {return sessions.stream();}
-    public static Stream<Session> getSessions(Faculty faculty) {
-        return sessions
-                .stream()
-                .filter(
-                        session -> session.withFaculty(faculty.getEmpCode())
-                );
 
+
+    public static List<Session> getSessions(Faculty f, Course c) {
+        var dirPath = resolveUptoCourseDir(f,c.getCode());
+        return loadSessionViews(dirPath);
     }
     public static Stream<Session> getSessions(String courseCode) {
-        return sessions.stream().filter(session -> session.isOfCourse(courseCode));
+        var faculties = CourseDB.getFacultiesForCourse(courseCode);
+        return faculties.flatMap(faculty -> loadSessions(resolveUptoCourseDir(faculty, courseCode)));
     }
 
-    public static boolean isEmpty() {
-        return sessions.isEmpty();
+    private static File resolveSessionFile(Session s) {
+        Path facultyPath = SessionsDir.resolve(s.getFacultyCode());
+        Path coursePath = facultyPath.resolve(s.getCourseCode());
+        Path sessionFilePath = coursePath.resolve(sessionString(s));
+        if (!Files.exists(coursePath)) {
+            try {
+                Files.createDirectories(coursePath);
+            } catch (IOException ignore) {
+                return SessionsDir.resolve(sessionString(s)).toFile();
+            }
+        }
+        return sessionFilePath.toFile();
     }
-    @SuppressWarnings("unchecked")
-    public static void loadDatabase(String sessionFile) {
+    private static Path resolveUptoCourseDir(Faculty f,String c) {
+        Path facultyPath = SessionsDir.resolve(f.getEmpCode());
+        Path coursePath = facultyPath.resolve(c);
+        if (!Files.exists(coursePath)) {
+            try {
+                Files.createDirectories(coursePath);
+            } catch (IOException ignore) {
+                return Loader.TRASHDIR;
+            }
+        }
+        return coursePath;
+    }
+    public static void loadSession(Session s) {
+        var sessionFile = resolveSessionFile(s);
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(sessionFile))) {
-            sessions.clear();
-            var _sessions = (ArrayList<Session>) inputStream.readObject();
-            sessions.addAll(_sessions);
-        } catch (IOException | ClassNotFoundException ignored) {}
+            s.readExternal(inputStream);
+            sessionsCache.cache(s);
+        } catch (IOException | ClassNotFoundException ignored) {retarded.add(s);}
+    }
+    public static List<Session> loadSessionViews(Path sessionsDir) {
+        try (Stream<Path> stream = Files.walk(sessionsDir)) {
+            return stream.filter(Files::isRegularFile)
+                         .map(SessionDB::loadSessionViewFromFile)
+                         .flatMap(Optional::stream)
+                         .collect(Collectors.toList());
+        } catch (IOException e) {
+            System.out.println(e.toString());
+            return Collections.emptyList();
+        }
+    }
+    private static Optional<Session> loadSessionViewFromFile(Path path) {
+        Session s = new Session();
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(path.toFile()))) {
+            s.readView(inputStream);
+            sessionsCache.cache(s);
+            return Optional.of(s);
+        } catch (IOException | ClassNotFoundException ignored) {
+            retarded.add(s);
+            return Optional.empty();
+        }
+    }
+
+    public static Stream<Session> loadSessions(Path sessionsDir) {
+        try (Stream<Path> stream = Files.walk(sessionsDir)) {
+            return stream.filter(Files::isRegularFile)
+                         .map(SessionDB::readSessionFromFile)
+                         .flatMap(Optional::stream);
+        } catch (IOException e) {return Stream.empty();}
+    }
+    private static Optional<Session> readSessionFromFile(Path path) {
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(path.toFile()))) {
+            Session s = new Session();
+            s.readExternal(inputStream);
+            sessionsCache.cache(s);
+            return Optional.of(s);
+        } catch (IOException | ClassNotFoundException e) {return Optional.empty();}
+    }
+    private static void writeSession(Session s) {
+        var filePath = resolveSessionFile(s);
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
+            s.writeExternal(outputStream);
+        } catch (IOException ignore) {retarded.add(s);}
     }
     public static void saveData(String sessionFile) {
         if (!changed) return;
-        try {
-                FileWriter writer = new FileWriter(sessionFile);
-                writer.write("");
-                writer.close();
+//        try {
+//                FileWriter writer = new FileWriter(sessionFile);
+//                writer.write("");
+//                writer.close();
+//            } catch (IOException ignore) {}
+//        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(sessionFile))) {
+//            outputStream.writeObject(sessionsCache);
+//        } catch (IOException ignore) {}
+        retarded.forEach(s -> {
+            var filePath = Loader.TRASHDIR.resolve(s.getFacultyCode()+"$"+s.getCourseCode()+"$"+s.getTime());
+            try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(filePath.toFile()))) {
+                s.writeExternal(outputStream);
             } catch (IOException ignore) {}
-        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(sessionFile))) {
-            outputStream.writeObject(sessions);
-        } catch (IOException ignore) {}
+        });
         System.out.println("Session data Saved");
     }
 }

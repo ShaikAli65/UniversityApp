@@ -66,10 +66,10 @@ public class AdminApp implements University {
 			switch(University.getIntegerFromInput())
 			{
 				case 1: System.out.print("Enter the new Name :");
-				student.name = scanner.next();
+				student.name = University.getStringFromInput(false);
 				break;
 				case 2: System.out.print("Enter the new DOB :");
-				student.setDOB(scanner.next());
+				student.setDOB(University.getStringFromInput(true));
 				break;
 				case 3: System.out.print("Enter the new Email ID :");
 				student.emailId = scanner.next();
@@ -80,7 +80,7 @@ public class AdminApp implements University {
 				case 5: System.out.print("Not allowed to change Roll No.");
 				break;
 				case 6: System.out.print("Enter the new Branch :");
-				student.branch = scanner.next();
+				student.branch = University.getStringFromInput(false);
 				break;
 				case 7: System.out.print("Enter the new Semester :");
 				student.setSemester(University.getIntegerFromInput());
@@ -104,11 +104,11 @@ public class AdminApp implements University {
 			switch (University.getIntegerFromInput()) {
 				case 1:
 					System.out.print("Enter the new Name: ");
-					faculty.name = scanner.next();
+					faculty.name = University.getStringFromInput(false);
 					break;
 				case 2:
 					System.out.print("Enter the new DOB: ");
-					faculty.setDOB(scanner.next());
+					faculty.setDOB(University.getStringFromInput(true));
 					break;
 				case 3:
 					System.out.print("Enter the new Email ID: ");
@@ -123,7 +123,7 @@ public class AdminApp implements University {
 					break;
 				case 6:
 					System.out.print("Enter the new Department: ");
-					faculty.setDepartment(scanner.next());
+					faculty.setDepartment(University.getStringFromInput(false));
 					break;
 				case 7:
 					System.out.print("Enter the new Experience: ");
@@ -150,8 +150,6 @@ public class AdminApp implements University {
 		StudentDB.remove(student);
 		StudentApp.removeStudent(student);
 		AttendanceDB.remove(student);
-		SessionDB.remove(student);
-		ExamDB.remove(student);
 	}
 
 	void deleteFaculty()  {

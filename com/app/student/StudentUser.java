@@ -8,6 +8,7 @@ import app.academics.StudentCourses;
 import app.admin.Student;
 import db.AttendanceDB;
 import db.CourseDB;
+import db.ExamDB;
 import db.SessionDB;
 
 import java.io.Serializable;
@@ -35,7 +36,7 @@ public class StudentUser implements University, Serializable
         printHeader("Attendance");
         System.out.println(AttendanceDB.getEntry(student));
         System.out.print("\nEnter course code to get Detailed view or . to return: ");
-        String courseCode = University.scanner.next().toUpperCase();
+        String courseCode = University.getStringFromInput(false);
         if(courseCode.contains(".")) return;
 
         printHeader("Attendance > Detailed View");
@@ -51,6 +52,7 @@ public class StudentUser implements University, Serializable
         try {
             var exam = Choices.getExam(course, "Exams > Detailed View");
             if (exam == null) {return;}
+            ExamDB.loadExam(exam);
             printHeader("Exams");
             exam.printExam();
         } catch (Exception e) {
@@ -73,13 +75,15 @@ public class StudentUser implements University, Serializable
         StringBuilder resultString = new StringBuilder();
         resultString.append("\n\n");
         var sessions = SessionDB.getSessions(courseCode).sorted();
-
-        sessions.forEach(session ->
-                resultString.append("[")
+        sessions.forEach(session ->{
+                    if (session.contains(student)){
+                        resultString.append("[")
                             .append(session.getTime())
                             .append("]\t: ")
                             .append(session.getAttendance(this.student) ? "Present" : "Absent")
-                            .append("\n"));
+                            .append("\n");
+                    }
+        });
         resultString.append("\n\nCOURSE :").append(CourseDB.get(courseCode)).append('\n');
         return resultString.toString();
     }

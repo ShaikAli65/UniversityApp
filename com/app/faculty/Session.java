@@ -19,15 +19,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 
-public class Session implements Serializable, Comparable<Session> {
+public class Session implements Externalizable, Comparable<Session> {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    final private Time time;
-    private final String facCode;
-    private final String courseCode;
-    private transient Map<Student, Boolean> attendees;
-//    private final Map<Student, Boolean> attendees;
+    public Time time;
+    public String facCode;
+    public String courseCode;
+    private final transient Map<Student, Boolean> attendees;
 
     public Session(Time time, Course course, Faculty faculty) {
         this.time = time;
@@ -42,19 +41,25 @@ public class Session implements Serializable, Comparable<Session> {
         this.attendees = attendees;
     }
 
+    public Session() {
+        time = new Time();
+        facCode = courseCode = "";
+        attendees = new HashMap<>();
+    }
+
     public void takeAttendanceEntries() {
         System.out.println("Enter Attendance of respective students :");
         var students = CourseDB.getStudentsWithCourse(courseCode);
         AtomicInteger present = new AtomicInteger();
         students.sequential().forEach(student -> {
-            System.out.print("ROLL NO : " + student.getRollNo() + "\tAttendance (1/0):");
+            System.out.print("ROLL NO : " +student.getRollNo()+ "\tAttendance (1/0):");
             var attendance = University.getIntegerFromInput() != 0;
             attendees.put(student, attendance);
             present.addAndGet(attendance ? 1 : 0);
             AttendanceDB.add(student, courseCode, attendance);
         });
         students.close();
-        System.out.println("STATS : " + present + " PRESENT\t" + (attendees.size() - present.get()) + " ABSENT");
+        System.out.println("STATS : " +present+ " PRESENT\t" +(attendees.size() - present.get())+ " ABSENT");
     }
     public HashMap<Integer, Student> printSession() {
         var course = CourseDB.get(courseCode);
@@ -123,13 +128,14 @@ public class Session implements Serializable, Comparable<Session> {
     }
 
     public Map<Student, Boolean> getAttendees() {return attendees;}
-    public String  getCourse() {return courseCode;}
-    public String getFaculty() {return facCode;}
+    public String getCourseCode() {return courseCode;}
+    public String getFacultyCode() {return facCode;}
     public Time    getTime() {return time;}
     public boolean getAttendance(Student s) {return attendees.get(s);}
     public boolean isOfCourse(String cCode) {return this.courseCode.equals(cCode);}
     public boolean withFaculty(String facCode) {return this.facCode.equals(facCode);}
-    public boolean matchContains(String _check) {
+    public boolean contains(Student s) {return attendees.containsKey(s);}
+    public boolean matchSession(String _check) {
         var course = CourseDB.get(courseCode);
         return courseCode.toLowerCase().contains(_check)
                 || course.getName().toLowerCase().contains(_check)
@@ -150,32 +156,37 @@ public class Session implements Serializable, Comparable<Session> {
     public int hashCode() {return Objects.hash(time, courseCode, facCode);}
     @Override
     public int compareTo(Session o) {return this.time.compareTo(o.time);}
-    @Serial
-    @SuppressWarnings("unchecked")
-    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
-        ois.defaultReadObject();
 
-        try {
-            this.attendees = new HashMap<>();
-            var attendeeIds = (HashMap<String, Boolean>) ois.readObject();
-            for (var entry : attendeeIds.entrySet()) {
-                Student student = StudentDB.getStudent(entry.getKey());
-                this.attendees.put(student, entry.getValue());
-            }
-        }
-        catch (ClassNotFoundException e) {
-            this.attendees = new HashMap<>();
-        }
-    }
-    @Serial
-    private void writeObject(ObjectOutputStream oos) throws IOException {
-        oos.defaultWriteObject();
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(time);
+        out.writeObject(facCode);
+        out.writeObject(courseCode);
         var attendeeIds = this.attendees.entrySet()
                  .stream()
                  .collect(Collectors.toMap(
                          entry -> entry.getKey().getRollNo(),
                          Map.Entry::getValue
                  ));
-        oos.writeObject(attendeeIds);
+        out.writeObject(attendeeIds);
+    }
+    @Override
+    @SuppressWarnings("unchecked")
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        time = (Time) in.readObject();
+        facCode = (String) in.readObject();
+        courseCode = (String) in.readObject();
+        var attendeeIds = (HashMap<String,Boolean>) in.readObject();
+        for (var entry : attendeeIds.entrySet()) {
+                Student student = StudentDB.getStudent(entry.getKey());
+                if (student != null){
+                    this.attendees.put(student, entry.getValue());
+                }
+        }
+    }
+    public void readView(ObjectInput in) throws IOException, ClassNotFoundException {
+        time = (Time) in.readObject();
+        facCode = (String) in.readObject();
+        courseCode = (String) in.readObject();
     }
 }

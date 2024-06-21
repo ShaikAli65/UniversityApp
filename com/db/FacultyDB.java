@@ -14,6 +14,7 @@ public class FacultyDB {
     public static void add(Faculty faculty) {
         changed = true;
         faculties.put(faculty.getEmpCode(), faculty);
+        SessionDB.register(faculty);
     }
     public static void update(Faculty faculty) {
         changed = true;
