@@ -43,7 +43,7 @@ class Person implements Serializable
 
 	void setDOB(String d)
 	{
-		this.dob= new Date(d);
+		this.dob.setDate(d);
 	}
 
 	public String getName()
