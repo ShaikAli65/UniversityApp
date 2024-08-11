@@ -34,7 +34,11 @@ public class StudentUser implements University, Serializable
 
     public void seeAttendance() {
         printHeader("Attendance");
-        System.out.println(AttendanceDB.getEntry(student));
+        String s = AttendanceDB.getEntry(student);
+        if (s == null){
+            System.out.println("No Attendance data found");
+            UniversityApp.holdNextSlide();
+        }
         System.out.print("\nEnter course code to get Detailed view or . to return: ");
         String courseCode = University.getStringFromInput(false);
         if(courseCode.contains(".")) return;

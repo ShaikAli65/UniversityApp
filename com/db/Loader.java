@@ -10,7 +10,6 @@ import app.admin.Faculty;
 import app.admin.Student;
 import app.faculty.Session;
 
-import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -63,15 +62,9 @@ public class Loader {
 
     private static void checkPaths() {
         if(! Files.exists(TRASHDIR)) {
-            try {
-                Files.createDirectory(TRASHDIR);
-            } catch (IOException e) {
-                System.out.println("Error finding and creating retarded directory");
-                System.out.println("Exiting");
-                System.exit(-1);
-            }
+            var v = TRASHDIR.toFile().mkdirs();
+//                Files.createDirectory(TRASHDIR);
         }
-
     }
 
     public static void storeDataBases() {

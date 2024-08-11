@@ -12,8 +12,6 @@
  * version 2 for more details (a copy is included in the LICENSE file that
  * accompanied this code).
  *
- * You should have received a copy of the GNU General Public License version
- * 2 along with this work; if not, write to the Free Software Foundation,
  * I I I T Kottayam, Academics Department, 1st floor, Kottayam, 686635 INDIA.
  *
  * Please contact I I I T Kottayam, KERALA, KOTTAYAM 686635 INDIA.
@@ -31,8 +29,6 @@ import db.CourseDB;
 import db.FacultyDB;
 import db.Loader;
 import db.StudentDB;
-
-
 public class UniversityApp implements University {
     public static final String Name = "I I I T - K";
     AdminApp admin = null;
@@ -47,8 +43,8 @@ public class UniversityApp implements University {
     }
 
     public static void main(String[] ar) {
-        //   Loader.dupData();
-        //   Loader.storeDataBases();
+//          Loader.dupData();
+//          Loader.storeDataBases();
         UniversityApp.makeClear();
         Loader.loadDataBases();
         System.out.println("\nlaunching");
@@ -214,14 +210,16 @@ public class UniversityApp implements University {
             } else {
                 System.out.print("\033[H\033[2J");
                 System.out.flush();
+
             }
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
     }
 
     public static void holdNextSlide() {
         System.out.print("\nPress Enter to Continue");
-        scanner.next();
+//        scanner.next();
+//        scanner.nextLine();
+        console.readLine();
     }
 
     @Override

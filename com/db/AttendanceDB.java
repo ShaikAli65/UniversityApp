@@ -75,7 +75,7 @@ public class AttendanceDB {
     }
     public static String getEntry(Student s) {
 
-        if (!entries.containsKey(s.getRollNo())) return "No Attendance Data Found";
+        if (!entries.containsKey(s.getRollNo())) return null;
         return entries.get(s.getRollNo()).toString();
     }
     public static void update(Student st, String courseCode, boolean what) {

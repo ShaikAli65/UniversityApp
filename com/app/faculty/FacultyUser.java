@@ -42,7 +42,8 @@ public class FacultyUser implements University, Serializable
         printHeader("Adding Session");
         Time time = new Time();
         time.addTime();
-        Session session = new Session(time, Choices.getCourse(coursesCache, "Adding Session"), this.faculty);
+        var selectedCourse = Choices.getCourse(coursesCache, "Adding Session");
+        Session session = new Session(time, selectedCourse, this.faculty);
         printHeader("Adding Session > Entering Attendance");
         session.takeAttendanceEntries();
         UniversityApp.holdNextSlide();
@@ -57,6 +58,8 @@ public class FacultyUser implements University, Serializable
         var sessions = SessionDB.getSessions(this.faculty,course);
         var session = Choices.getChoice(sessions, "Displaying Sessions > "+course.getCode());
         if (session == null) {
+            UniversityApp.getError(5);
+            UniversityApp.holdNextSlide();
             return;
         }
         printHeader("Displaying Sessions");

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Choices {
-    private static final Scanner scanner = new Scanner(System.in);
+    private static final Scanner scanner = University.scanner ;
     public static Student getStudent(String headerDetail) {
         var students = StudentDB.getStudents().toList();
         return getChoice(students, headerDetail);
@@ -54,13 +54,14 @@ public class Choices {
         while (true) {
             printHeader(headerDetail + " > selecting");
             if (list.isEmpty()) {
-                System.out.println("No Results Found use \\ to print all users");
+                System.out.println("No Results Found use, \\ to print all users");
             }
             print(list);
             System.out.println(list.size()+" results for : " + searchedString);
-            System.out.print("Enter index (use '/' ->filter '.' ->back): ");
+            System.out.print("Enter index (use '/' -> filter '.' -> back): ");
+
             if(scanner.hasNextInt()){
-                int i = Integer.parseInt(scanner.next());
+                int i = University.getIntegerFromInput();
                 if (i < 0 || i > list.size()) {
                     UniversityApp.getError(6);
                     UniversityApp.holdNextSlide();

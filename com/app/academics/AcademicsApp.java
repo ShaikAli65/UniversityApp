@@ -107,8 +107,8 @@ public class AcademicsApp implements University {
 
 		if(CourseDB.isEmpty()){UniversityApp.getError(12); return;}
 
-//		printHeader("Adding Student Courses");
-		System.out.println("\nStudent :"+student.getName());
+		printHeader("Adding Student Courses > "+student.getName());
+
 		System.out.println("\nThese are the courses available in the Semester "+student.getSemester()+"\n");
 
 		List<Course> matched_courses = CourseDB.getCourses(student.getSemester()).toList();
@@ -121,7 +121,7 @@ public class AcademicsApp implements University {
 			choice++;
 		}
 
-        System.out.println("Select the required courses (Enter the respective index):");
+        System.out.print("Select the required courses (Enter the respective index):");
 
 		for(int i = 0; i < Math.min(matched_courses.size(), student.getNoCourses()); i++)
 		{
@@ -147,10 +147,9 @@ public class AcademicsApp implements University {
 		var facultyCourse = new FacultyCourses(faculty);
 		if(CourseDB.isEmpty()){System.out.println("No courses Available");return;}
 
-		printHeader("Adding Faculty Courses");
-		System.out.println("\nFaculty :" + faculty.getName());
+		printHeader("Adding Faculty Courses > "+faculty.getName());
 		var courses = printCourses();
-		System.out.println("Select the required courses : (Use Spaces for multiple selection)");
+		System.out.print("Select the required courses : (Use Spaces for multiple selection)");
 
 		for(int i = 0; i < Math.min(CourseDB.noOfCourses(), faculty.getNoCourses()); i++){
 			while(true){
@@ -181,7 +180,7 @@ public class AcademicsApp implements University {
 			if(CourseDB.getCourses(student) == null){UniversityApp.getError(3);continue;}
 			printHeader("Displaying Student-Course Details > " + student.getName());
 			System.out.print(CourseDB.getCourses(student).toString());
-			UniversityApp.holdNextSlide();
+//			UniversityApp.holdNextSlide();
 		}
 	}
 
