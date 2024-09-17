@@ -29,7 +29,6 @@ public class FacultyUser implements University, Serializable
     }
 
     public boolean authenticate() {
-        printHeader("Authentication");
         if(this.passwordArray == null) {UniversityApp.getError(2);return false;}
         char[] password = University.getPasswordFromInput();
         return Arrays.equals(passwordArray, password);
@@ -156,6 +155,10 @@ public class FacultyUser implements University, Serializable
             return;
         }
         ExamDB.remove(exam);
+    }
+
+    public Faculty getFaculty() {
+        return faculty;
     }
 
     @Override
