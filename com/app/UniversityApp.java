@@ -217,9 +217,9 @@ public class UniversityApp implements University {
 
     public static void holdNextSlide() {
         System.out.print("\nPress Enter to Continue");
+        scanner.nextLine();
 //        scanner.next();
-//        scanner.nextLine();
-        console.readLine();
+//        console.readLine();
     }
 
     @Override
