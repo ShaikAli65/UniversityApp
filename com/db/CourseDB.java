@@ -63,9 +63,12 @@ public class CourseDB {
     }
     public static Stream<Faculty> getFacultiesForCourse(String courseId) {
         var course = courses.get(courseId);
-        return FacultyDB.getFaculties().filter(
-                faculty -> facultyCourses.getOrDefault(faculty.getEmpCode(), new FacultyCourses())
-                        .contains(course)
+        return FacultyDB.getFaculties()
+                .filter(
+                        faculty -> facultyCourses.getOrDefault(
+                                faculty.getEmpCode(),
+                                new FacultyCourses()
+                        ).contains(course)
         );
     }
 
@@ -135,6 +138,7 @@ public class CourseDB {
                 """
                         Course Data Saved
                         Student Course Data Saved
-                        Faculty Course Data Saved""");
+                        Faculty Course Data Saved"""
+        );
     }
 }

@@ -32,8 +32,6 @@ public interface University
 						throw new Exception();
 					}
 				}
-//				System.out.println("got input : " + input);
-//				UniversityApp.holdNextSlide();
 				return input;
 			} catch (Exception e) {
 				UniversityApp.getError(7);

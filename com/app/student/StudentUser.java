@@ -14,7 +14,6 @@ import db.SessionDB;
 import java.io.Serializable;
 import java.util.Arrays;
 
-
 public class StudentUser implements University, Serializable
 {
     final private char[] passwordArray;
@@ -26,7 +25,6 @@ public class StudentUser implements University, Serializable
     }
 
     public boolean authenticate() {
-        printHeader("Authentication");
         if (this.passwordArray == null) {UniversityApp.getError(2);return false;}
         char[] password = University.getPasswordFromInput();
         return Arrays.equals(passwordArray, password);
@@ -39,12 +37,17 @@ public class StudentUser implements University, Serializable
             System.out.println("No Attendance data found");
             UniversityApp.holdNextSlide();
         }
-        System.out.print("\nEnter course code to get Detailed view or . to return: ");
-        String courseCode = University.getStringFromInput(false);
-        if(courseCode.contains(".")) return;
+        var courses = retrieveCourses();
+        Course course = Choices.getCourse(courses, "Attendance View > Courses");
+        if (course == null) {
+            return;
+        }
+//        String courseCode = University.getStringFromInput(true);
+//        if(courseCode.contains(".")) return;
 
         printHeader("Attendance > Detailed View");
-        System.out.println(getCourseAttendance(courseCode));
+        String attendenceString = getCourseAttendance(course.getCode());
+        System.out.println(attendenceString);
         UniversityApp.holdNextSlide();
     }
     public void seeExam() {
@@ -75,10 +78,11 @@ public class StudentUser implements University, Serializable
     }
 
     private StudentCourses retrieveCourses() {return CourseDB.getCourses(this.student);}
+
     private String getCourseAttendance(String courseCode) {
         StringBuilder resultString = new StringBuilder();
         resultString.append("\n\n");
-        var sessions = SessionDB.getSessions(courseCode).sorted();
+        var sessions = SessionDB.getSessions(courseCode);
         sessions.forEach(session ->{
                     if (session.contains(student)){
                         resultString.append("[")
@@ -94,6 +98,11 @@ public class StudentUser implements University, Serializable
 
     @Override
     public String display() {return "";}
+
+    public Student getStudent() {
+        return student;
+    }
+
     @Override
     public void printHeader(String out) {
         UniversityApp.makeClear();

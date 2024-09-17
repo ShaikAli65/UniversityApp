@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Choices {
-    private static final Scanner scanner = University.scanner ;
     public static Student getStudent(String headerDetail) {
         var students = StudentDB.getStudents().toList();
         return getChoice(students, headerDetail);
@@ -60,7 +59,7 @@ public class Choices {
             System.out.println(list.size()+" results for : " + searchedString);
             System.out.print("Enter index (use '/' -> filter '.' -> back): ");
 
-            if(scanner.hasNextInt()){
+            if(University.scanner.hasNextInt()){
                 int i = University.getIntegerFromInput();
                 if (i < 0 || i > list.size()) {
                     UniversityApp.getError(6);
