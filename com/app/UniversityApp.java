@@ -224,7 +224,7 @@ public class UniversityApp implements University {
 
     @Override
     public void printHeader(String s) {
-        System.out.println("--------------University Panel--------------");
+        System.out.println("---------------University Panel--------------");
         System.out.println("IN: " + s);
         System.out.println("---------------------------------------------\n");
     }
