@@ -83,7 +83,7 @@ public class StudentUser implements University, Serializable
         StringBuilder resultString = new StringBuilder();
         resultString.append("\n\n");
         var sessions = SessionDB.getSessions(courseCode);
-        sessions.forEach(session ->{
+        sessions.sequential().forEach(session ->{
                     if (session.contains(student)){
                         resultString.append("[")
                             .append(session.getTime())
