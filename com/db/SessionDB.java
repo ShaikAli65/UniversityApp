@@ -66,8 +66,6 @@ public class SessionDB {
 
     public static List<Session> loadSessions(Path sessionsDir) {
         try (Stream<Path> stream = Files.walk(sessionsDir)) {
-            System.out.print("reading");
-            System.out.println(sessionsDir);
             return stream
                     .filter(Files::isRegularFile)
                     .map(SessionDB::readSessionFromFile)
