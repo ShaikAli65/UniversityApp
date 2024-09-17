@@ -21,7 +21,20 @@ public class StudentApp implements University {
         if (student == null) {return null;}
 
         var studentUser = getStudentHandle(student);
-        if (studentUser == null) {UniversityApp.getError(15);return null;}
+        printHeader("Student App >"+studentUser.getStudent().getName()+" >login");
+        int retryCount = 3;
+        while (retryCount > 0) {
+            if (studentUser.authenticate()) {
+                break;
+            }
+            else{
+                UniversityApp.getError(13);
+                printHeader("Student App >"+studentUser.getStudent().getName()+" >login retries left("+(--retryCount)+")");
+            }
+        }
+        if (retryCount == 0) {
+            return null;
+        }
 
         loop: while(true) {
             printHeader(student.getName() + " is logged in");
@@ -52,23 +65,23 @@ public class StudentApp implements University {
     // Getters
 
     private StudentUser getStudentHandle(Student student) {
-        StudentUser userHandle = UserHandlesDB.getHandle(student);
-        return authenticate(userHandle);
+        return UserHandlesDB.getHandle(student);
     }
 
-    private StudentUser authenticate(StudentUser userHandle) {
+    private boolean authenticate(StudentUser userHandle) {
         int retryCount = 3;
         while (retryCount > 0) {
             if (userHandle != null && userHandle.authenticate()) {
-                return userHandle;
+                return true;
             }
             else{
                 UniversityApp.getError(13);
+                System.out.println("retries left : " + (--retryCount));
                 UniversityApp.holdNextSlide();
-                System.out.print("retries left : " + (--retryCount));
             }
         }
-        return null;
+        UniversityApp.getError(15);
+        return false;
     }
 
     // Display Functions

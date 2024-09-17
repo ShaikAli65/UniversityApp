@@ -19,13 +19,23 @@ public class FacultyApp implements University {
 
     @Override
     public String display() {
-
         Faculty faculty = Choices.getFaculty("FacultyApp > Logging");
         if (faculty == null) {return null;}
-        printHeader("logging > " + faculty.getName());
-        var facultyUser = getFacultyHandle(faculty);
-        if (facultyUser == null) {UniversityApp.getError(15);return null;}
-
+        FacultyUser facultyUser = getFacultyHandle(faculty);
+        printHeader("Faculty App > "+facultyUser.getFaculty().getName()+" > login");
+        int retryCount = 3;
+        while (retryCount > 0) {
+            if (facultyUser.authenticate()) {
+                break;
+            }
+            else{
+                UniversityApp.getError(13);
+                printHeader("Faculty App > "+facultyUser.getFaculty().getName()+" > login retries left("+(--retryCount)+")");
+            }
+        }
+        if (retryCount <= 0) {
+            return null;
+        }
         loop: while(true) {
             printHeader(faculty.getName() + " is logged in");
             ShowFacultyAppMenu();
@@ -59,8 +69,7 @@ public class FacultyApp implements University {
     // Getters and Setters
 
     private FacultyUser getFacultyHandle(Faculty faculty) {
-        FacultyUser userHandle = UserHandlesDB.getHandle(faculty);
-        return authenticate(userHandle);
+        return UserHandlesDB.getHandle(faculty);
     }
 
     private FacultyUser authenticate(FacultyUser userHandle) {
