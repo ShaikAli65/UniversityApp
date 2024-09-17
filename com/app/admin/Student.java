@@ -3,12 +3,10 @@ package app.admin;
 import app.University;
 
 import java.util.Objects;
-import java.util.Scanner;
 
 
 public class  Student extends Person implements Comparable<Student>//, Serializable
 {
-	private static final Scanner scanner = University.scanner;
 	protected String rollNo;
 	protected String branch;
 	private int semester;
@@ -65,7 +63,7 @@ public class  Student extends Person implements Comparable<Student>//, Serializa
 		System.out.print("\nEnter  No of Courses : "); this.no_courses = University.getIntegerFromInput();
 		System.out.print("\nEnter  DOB : "); this.setDOB(University.getStringFromInput(true));
 		System.out.print("\nEnter  Mobile : "); this.mobile = University.getLongFromInput();
-		System.out.print("\nEnter  Email Id : "); this.emailId= scanner.next();
+		System.out.print("\nEnter  Email Id : "); this.emailId= University.scanner.next();
 		System.out.print("\nEnter  Branch : "); this.branch = University.getStringFromInput(false);
 	}
 
