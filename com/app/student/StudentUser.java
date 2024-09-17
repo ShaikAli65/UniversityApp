@@ -6,6 +6,7 @@ import app.UniversityApp;
 import app.academics.Course;
 import app.academics.StudentCourses;
 import app.admin.Student;
+import app.faculty.Session;
 import db.AttendanceDB;
 import db.CourseDB;
 import db.ExamDB;
@@ -13,6 +14,7 @@ import db.SessionDB;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class StudentUser implements University, Serializable
 {
@@ -32,22 +34,28 @@ public class StudentUser implements University, Serializable
 
     public void seeAttendance() {
         printHeader("Attendance");
-        String s = AttendanceDB.getEntry(student);
-        if (s == null){
-            System.out.println("No Attendance data found");
-            UniversityApp.holdNextSlide();
+        var entry = AttendanceDB.getEntry(student);
+        if (entry == null){
+            UniversityApp.getError(19);
+            return;
+        }
+        System.out.println(entry);
+        System.out.print("\nenter 0 to return 1 to enter detailed view : ");
+        int what = University.getIntegerFromInput();
+        if (what == 0) {
+            return;
         }
         var courses = retrieveCourses();
         Course course = Choices.getCourse(courses, "Attendance View > Courses");
         if (course == null) {
             return;
         }
-//        String courseCode = University.getStringFromInput(true);
-//        if(courseCode.contains(".")) return;
-
         printHeader("Attendance > Detailed View");
-        String attendenceString = getCourseAttendance(course.getCode());
-        System.out.println(attendenceString);
+        printCourseAttendance(course.getCode());
+        var s = entry.getAttendance(course);
+        System.out.println("TOTAL SESSIONS   : "+s.getConducted());
+        System.out.println("ATTENDED         : "+s.getAttended());
+        System.out.println("PECENTAGE        : "+s.getPercentage()+"%");
         UniversityApp.holdNextSlide();
     }
     public void seeExam() {
@@ -79,21 +87,20 @@ public class StudentUser implements University, Serializable
 
     private StudentCourses retrieveCourses() {return CourseDB.getCourses(this.student);}
 
-    private String getCourseAttendance(String courseCode) {
-        StringBuilder resultString = new StringBuilder();
-        resultString.append("\n\n");
-        var sessions = SessionDB.getSessions(courseCode);
-        sessions.sequential().forEach(session ->{
-                    if (session.contains(student)){
-                        resultString.append("[")
-                            .append(session.getTime())
-                            .append("]\t: ")
-                            .append(session.getAttendance(this.student) ? "Present" : "Absent")
-                            .append("\n");
-                    }
-        });
-        resultString.append("\n\nCOURSE :").append(CourseDB.get(courseCode)).append('\n');
-        return resultString.toString();
+    private void printCourseAttendance(String courseCode) {
+        System.out.println();
+        var sessions = SessionDB.getSessions(courseCode).toList();
+        for(Session session : sessions) {
+            if (session.contains(student)){
+                String resultString = "[" +
+                        session.getTime() +
+                        "]\t: " +
+                        (session.getAttendance(this.student) ? "Present" : "Absent") +
+                        "\n";
+                System.out.print(resultString);
+            }
+        }
+        System.out.println("\n\nCOURSE :" + CourseDB.get(courseCode) + '\n');
     }
 
     @Override
