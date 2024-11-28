@@ -89,7 +89,7 @@ public class StudentUser implements University, Serializable
 
     private void printCourseAttendance(String courseCode) {
         System.out.println();
-        var sessions = SessionDB.getSessions(courseCode).toList();
+        var sessions = SessionDB.getSessions(courseCode).sequential().toList();
         for(Session session : sessions) {
             if (session.contains(student)){
                 String resultString = "[" +
