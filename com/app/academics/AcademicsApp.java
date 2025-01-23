@@ -180,7 +180,7 @@ public class AcademicsApp implements University {
 			if(CourseDB.getCourses(student) == null){UniversityApp.getError(3);continue;}
 			printHeader("Displaying Student-Course Details > " + student.getName());
 			System.out.print(CourseDB.getCourses(student).toString());
-//			UniversityApp.holdNextSlide();
+			UniversityApp.holdNextSlide();
 		}
 	}
 
