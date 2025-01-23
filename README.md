@@ -4,6 +4,22 @@ This Java-based command line application is designed to manage the various admin
 
 ![image](https://github.com/user-attachments/assets/4ac446fa-b40d-4c2d-8e62-76ba24ee1ea9)
 
+---
+
+### Implementation Details:
+- **Language**: Fully implemented in Java.
+- **Libraries**: Uses only the standard Java library.
+- **Data Serialization**: Java's object serialization is used for data management.
+- **Data Persistence**: Does not use any modern Database, works purely on Local file system, handles everything with java objects, a simple data access layer written from scratch.
+- **Lazy Loading**: Complex relation ships like Sessions and Exams are loaded incrementally as the user proceeds.
+- **Cacheing**: Caches recent queries temporarily on RAM (not tested yet).
+- **Data Processing**: Leverages Java’s Stream API for sequential and parallel processing.
+- **User Interface**: provides a simple and intuitive UI/UX
+
+     > Example:
+     > performs intuitive filtering through user inputs over large numbers of items (list of students)
+---
+
 #### Features:
 1. **Admin Controls**
 2. **Academic Controls**
@@ -69,18 +85,8 @@ Students can:
 
 ---
 
-### Implementation Details:
-- **Language**: Fully implemented in Java.
-- **Libraries**: Uses only the standard Java library.
-- **Data Persistence**: Local file system is used for data storage.
-- **Lazy Loading**: Sessions and exams are loaded on demand.
-- **Data Serialization**: Java's object serialization is used for data management.
-- **Data Processing**: Leverages Java’s Stream API for sequential and parallel processing.
-
----
-
 ### Performance Testing:
-The application was tested with the following data set:
+The application was tested with the following data:
 - 100 faculty members
 - 1400 students
 - 40 courses
