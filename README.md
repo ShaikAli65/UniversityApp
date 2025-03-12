@@ -4,6 +4,21 @@ This Java-based command line application is designed to manage the various admin
 
 ![image](https://github.com/user-attachments/assets/4ac446fa-b40d-4c2d-8e62-76ba24ee1ea9)
 
+### Usage
+
+* make sure you have java sdk installed in your system
+
+```sh
+java --version
+```
+
+* Get the lastest release from **Releases** section of github.
+download `.jar` file 
+* run jar file
+```sh
+java -jar /path/to/universityapp.jar
+```
+
 ---
 
 ### Implementation Details:
