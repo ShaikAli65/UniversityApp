@@ -25,10 +25,11 @@ jobs:
           mkdir -p out
           javac -d out $(find com -name "*.java")
 
-      - name: Create JAR file
+      - name: Create JAR file with Main-Class manifest
         run: |
           mkdir -p dist
-          jar cvf dist/UniversityApp.jar -C out .
+          # Replace 'com.example.Main' with your actual fully qualified main class name
+          jar cfe dist/UniversityApp.jar com.app.UniversityApp -C out .
 
       - name: Upload JAR as Artifact
         uses: actions/upload-artifact@v4
