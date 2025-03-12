@@ -28,7 +28,7 @@ replay_pid*
 
 # Compiled class file
 *.class
-out
+
 # Log file
 *.log
 
