@@ -1,0 +1,63 @@
+name: Build and Release Java JAR
+
+on:
+  push:
+    branches:
+      - release  # Runs only when changes are pushed to the 'release' branch
+
+jobs:
+  build:
+    name: Build JAR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'   # Uses Eclipse Temurin JDK (AdoptOpenJDK)
+          java-version: '20'        # Set the required Java version
+
+      - name: Compile Java source files
+        run: |
+          mkdir -p out
+          javac -d out $(find com -name "*.java")
+
+      - name: Create JAR file
+        run: |
+          mkdir -p dist
+          jar cvf dist/UniversityApp.jar -C out .
+
+      - name: Upload JAR as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-application-jar
+          path: dist/UniversityApp.jar
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: java-application-jar
+          path: dist
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v1.0.${{ github.run_number }}  # Auto-increment versioning
+          name: "Release v1.0.${{ github.run_number }}"
+          body: "Automated release generated from the 'release' branch."
+          draft: false
+          prerelease: false
+          artifacts: "dist/UniversityApp.jar"
