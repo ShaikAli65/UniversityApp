@@ -61,3 +61,4 @@ jobs:
           draft: false
           prerelease: false
           artifacts: "dist/UniversityApp.jar"
+          token: ${{ secrets.GH_PAT }}
