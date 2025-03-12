@@ -24,7 +24,7 @@ public class Exam implements Externalizable, Comparable<Exam> {
     private Date date;
     private boolean isEvaluated;
     private String courseCode;
-    private transient Map<Student, Integer> marks;
+    private final transient Map<Student, Integer> marks;
 
     public Exam(Date d, Course course){
         date = d;

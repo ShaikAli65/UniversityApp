@@ -240,6 +240,7 @@ public class AcademicsApp implements University {
 		ExamDB.add(exam);
 	}
 
+
 	private void displayExams() {
 		if(ExamDB.isEmpty()){UniversityApp.getError(14);return;}
 		var course = Choices.getCourse("Displaying Exams");
